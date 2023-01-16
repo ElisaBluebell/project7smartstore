@@ -12,6 +12,7 @@ class MainPage(QWidget, MainUIset):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.show()
         self.MAIN_STACK.setCurrentIndex(0)
         self.LOGIN_signal = False
         self.BT_setting()
@@ -77,14 +78,7 @@ class MainPage(QWidget, MainUIset):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    widget = QtWidgets.QStackedWidget()
 
     ex = MainPage()
-    inventory_management = InventoryManagement()
-
-    widget.addWidget(ex)
-    widget.addWidget(inventory_management)
-    widget.setGeometry(0, 0, 450, 660)
-    widget.show()
 
     sys.exit(app.exec_())
