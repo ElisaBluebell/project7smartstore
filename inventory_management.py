@@ -4,6 +4,7 @@ from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QWidget, QLabel, QPushButton
 
+
 class InventoryManagement(QWidget):
 
     def __init__(self):
@@ -23,26 +24,15 @@ class InventoryManagement(QWidget):
         table_title.setText('재고 보유 현황표')
         table_title.setGeometry(0, 120, 450, 20)
 
-    def set_line(self):
-        pass
-
     def set_btn(self):
         self.quit.setText('나가기')
         self.quit.setGeometry(370, 600, 60, 30)
         self.quit.clicked.connect(self.go_main)
 
-    def set_combo(self):
-        pass
-
-    def set_table(self):
-        pass
-
     def set_ui(self):
         self.set_label()
         self.set_line()
         self.set_btn()
-        self.set_combo()
-        self.set_table()
 
         self.setFont(QtGui.QFont('D2Coding'))
 
@@ -52,5 +42,3 @@ class InventoryManagement(QWidget):
     def go_main(self):
         print(self.user_info)
         self.parent().setCurrentIndex(0)
-
-
