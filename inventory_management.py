@@ -12,7 +12,6 @@ class InventoryManagement(QWidget):
         super().__init__()
         self.title = QLabel(self)
         self.quit = QPushButton(self)
-        self.show()
         self.set_ui()
 
     def set_label(self):
