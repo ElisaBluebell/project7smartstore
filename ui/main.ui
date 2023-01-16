@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>474</width>
+    <width>491</width>
     <height>685</height>
    </rect>
   </property>
@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="page">
     <widget class="QLabel" name="MAIN_LB_loginfo">
@@ -65,17 +65,56 @@
       <string>로그인</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="MAIN_BT_test1">
+    <widget class="QPushButton" name="MAIN_BT_seller_order">
      <property name="geometry">
       <rect>
-       <x>30</x>
-       <y>530</y>
+       <x>180</x>
+       <y>460</y>
        <width>91</width>
        <height>91</height>
       </rect>
      </property>
      <property name="text">
-      <string>주문</string>
+      <string>재료주문</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="MAIN_BT_seller_insert">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>460</y>
+       <width>91</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>상품등록</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="MAIN_BT_buyer_buy">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>560</y>
+       <width>91</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>상품구매</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="MAIN_BT_buyer_orderlist">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>560</y>
+       <width>91</width>
+       <height>91</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>주문내역</string>
      </property>
     </widget>
    </widget>
@@ -106,6 +145,7 @@
      </column>
     </widget>
    </widget>
+   <widget class="QWidget" name="page_3"/>
   </widget>
  </widget>
  <resources/>

@@ -14,6 +14,8 @@ class LoginPage(QWidget, LoginUIset):
         self.LOGIN_stack.setCurrentIndex(0)
 
         self.LOGIN_BT_regist.clicked.connect(self.Page_regist)
+        self.LOGIN_BT_login.clicked.connect(self.LoginChecking)
+        self.LOGINMAIN_pass.returnPressed.connect(self.LoginChecking)
 
 
     def GO_main(self, check):
@@ -22,27 +24,27 @@ class LoginPage(QWidget, LoginUIset):
                 if self.signal_pass :
                     if len(self.REGIST_name.text()) != 0:
                         if len(self.REGIST_number.text()) != 0:
-                            # db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
-                            # cursor = db.cursor()
-                            # cursor.execute("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS "
-                            #                "WHERE TABLE_NAME  = 'regist_list' ")
-                            # temp = cursor.fetchall()
-                            # listcount = cursor.execute("select count(*) from biconn.regist_list")
-                            print("1")
-                            print(self.REGIST_id.text())
-                            print(self.REGIST_pass.text())
-                            print(self.REGIST_name.text())
-                            print("2")
-                            colunms = ()
-                            # for i in temp:
-                            #     colunms = colunms + i
-                            # cursor.execute(f"insert into biconn.regist_list (ID,PASS,NAME,PHONE,SEPT) "
-                            #                f"values('{self.REGIST_id.text()}','{self.REGIST_pass.text()}','{self.REGIST_name.text()}','{self.REGIST_number.text()}','{self.REGIST_radio2.isChecked()}')")
-                            # db.commit()
-                            # db.close()
+                            db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
+                            cursor = db.cursor()
+                            if self.REGIST_radio.isChecked():
+                                if self.REGIST_adminnumber.text() == None or self.REGIST_adminnumber.text() == "" :
+                                    QMessageBox.information(self, "알림", "상호명을 입력하세요")
+                                    db.close()
+                                    return
+
+                                cursor.execute(
+                                    f"insert into project7smartstore.user_info (user_id,user_pw,user_name,user_tel,store_name,user_type) "
+                                    f"values('{self.REGIST_id.text()}','{self.REGIST_pass.text()}','{self.REGIST_name.text()}','{self.REGIST_number.text()}','{self.REGIST_adminnumber.text()}','{self.REGIST_radio.isChecked()}')")
+
+                            else:
+                                cursor.execute(f"insert into project7smartstore.user_info (user_id,user_pw,user_name,user_tel,user_type) "
+                                               f"values('{self.REGIST_id.text()}','{self.REGIST_pass.text()}','{self.REGIST_name.text()}','{self.REGIST_number.text()}','{self.REGIST_radio.isChecked()}')")
+                            db.commit()
+                            db.close()
                             self.datareset('registsignal')
                             QMessageBox.information(self, "알림", "회원가입 완료")
-                            self.LOGIN_stack.setCurrentIndex(0)
+                            self.close()
+                            self.parent.PAGE_Login = LoginPage(self.parent)
                         else:
                             QMessageBox.information(self, "알림", "번호를 입력해주세요")
                     else:
@@ -54,6 +56,30 @@ class LoginPage(QWidget, LoginUIset):
         else:
             self.LOGIN_stack.setCurrentIndex(0)
             self.datareset('registsignal')
+
+    def LoginChecking(self):
+        db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
+        cursor = db.cursor()
+        check = cursor.execute(f"SELECT * from project7smartstore.user_info "
+                               f"WHERE user_id='{self.LOGINMAIN_id.text()}' and user_pw='{self.LOGINMAIN_pass.text()}'")
+        self.parent.UserInfo = cursor.fetchone()
+        print(self.parent.UserInfo)
+        db.close()
+        if check > 0:
+            self.parent.LOGIN_signal = True
+            self.close()
+            self.parent.BT_setting()
+            self.parent.MAIN_LB_loginfo.setText(self.parent.UserInfo[3])
+            self.parent.MAIN_BT_loginout.setText('로그아웃')
+            if self.parent.UserInfo[5] == 'True':
+                self.parent.MAIN_LB_loginfo2.setText('판매자')
+            else:
+                self.parent.MAIN_LB_loginfo2.setText('일반회원')
+
+        else:
+            QMessageBox.information(self, "알림", "ID / 비밀번호를 확인하세요.")
+
+
     #초기화 함수
     def datareset(self, signal):
         if signal == 'mainsignal':
@@ -71,8 +97,6 @@ class LoginPage(QWidget, LoginUIset):
             self.REGIST_idcheck.clear()
             self.REGIST_LB_passcheck.clear()
             self.REGIST_radio2.setChecked(True)
-            self.REGIST_adminnumber.clear()
-            self.regist_adminchecker()
             self.signal_id = False
             self.signal_pass = False
         elif signal == 'passsignal':
@@ -96,10 +120,11 @@ class LoginPage(QWidget, LoginUIset):
             return
 
         self.REGIST_idcheck.setStyleSheet("Color : red")  # 글자색 변환
-        # db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
-        # cursor = db.cursor()
-        # cursor.execute('select * from biconn.regist_list where ID = %s', self.REGIST_id.text())
-        if 1==2:
+        db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
+        cursor = db.cursor()
+        cursor.execute('select * from project7smartstore.user_info '
+                       'WHERE user_id = %s', self.REGIST_id.text())
+        if cursor.fetchone():
             self.REGIST_idcheck.setText('이미 존재하는 아이디입니다.')
             self.signal_id = False
         else:
