@@ -1,7 +1,7 @@
 import sys
 
 import pymysql
-from PyQt5 import uic, QtWidgets
+from PyQt5 import uic
 from PyQt5.QtWidgets import *
 
 from Login import LoginPage
@@ -76,6 +76,7 @@ class MainPage(QWidget, MainUIset):
 
     def bom_to_main(self):
         self.MAIN_STACK.setCurrentIndex(0)
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
