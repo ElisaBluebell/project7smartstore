@@ -20,6 +20,7 @@ class MainPage(QWidget, MainUIset):
         self.UserInfo = []
         self.MAIN_BT_loginout.clicked.connect(self.Move_LoginPage)
         self.MAIN_BT_seller_insert.clicked.connect(self.Move_test)
+        self.MAIN_BT_seller_order.clicked.connect(self.move_to_bill_of_material)
 
     def BT_setting(self):
         if self.LOGIN_signal == False:
@@ -69,6 +70,12 @@ class MainPage(QWidget, MainUIset):
         self.MAIN_strorelist.setCellWidget(self.MAIN_strorelist.rowCount() - 1, 2, self.combobox)
         self.MAIN_strorelist.scrollToBottom()
 
+    def move_to_bill_of_material(self):
+        self.MAIN_STACK.setCurrentIndex(2)
+        self.bom_go_back.clicked.connect(self.bom_to_main)
+
+    def bom_to_main(self):
+        self.MAIN_STACK.setCurrentIndex(0)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

@@ -198,7 +198,7 @@
     </widget>
    </widget>
    <widget class="QWidget" name="page_3">
-    <widget class="QLabel" name="label">
+    <widget class="QLabel" name="bom_store_name">
      <property name="geometry">
       <rect>
        <x>0</x>
@@ -219,7 +219,7 @@
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
-    <widget class="QPushButton" name="go_back">
+    <widget class="QPushButton" name="bom_go_back">
      <property name="geometry">
       <rect>
        <x>350</x>
@@ -232,7 +232,7 @@
       <string>나가기</string>
      </property>
     </widget>
-    <widget class="QLabel" name="table_title_2">
+    <widget class="QLabel" name="bom_select_menu_2">
      <property name="geometry">
       <rect>
        <x>30</x>
@@ -253,7 +253,7 @@
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
     </widget>
-    <widget class="QLabel" name="title">
+    <widget class="QLabel" name="bom_title">
      <property name="geometry">
       <rect>
        <x>0</x>
@@ -275,7 +275,7 @@
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
-    <widget class="QPushButton" name="add_ingredient">
+    <widget class="QPushButton" name="bom_add_ingredient">
      <property name="geometry">
       <rect>
        <x>240</x>
@@ -288,7 +288,7 @@
       <string>재료 추가</string>
      </property>
     </widget>
-    <widget class="QLabel" name="table_title">
+    <widget class="QLabel" name="bom_table_title">
      <property name="geometry">
       <rect>
        <x>350</x>
@@ -309,7 +309,7 @@
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
      </property>
     </widget>
-    <widget class="QComboBox" name="select_menu">
+    <widget class="QComboBox" name="bom_select_menu">
      <property name="geometry">
       <rect>
        <x>70</x>
@@ -319,7 +319,7 @@
       </rect>
      </property>
     </widget>
-    <widget class="QTableWidget" name="ingredient_table">
+    <widget class="QTableWidget" name="bom_ingredient_table">
      <property name="geometry">
       <rect>
        <x>30</x>
