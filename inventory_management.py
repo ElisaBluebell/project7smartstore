@@ -6,11 +6,10 @@ from PyQt5.QtWidgets import QWidget, QLabel, QPushButton
 
 class InventoryManagement(QWidget):
 
-    def __init__(self, user_info):
+    def __init__(self):
         super().__init__()
         self.quit = QPushButton(self)
         self.set_ui()
-        self.user_info = user_info
 
     def set_label(self):
         title = QLabel(self)
