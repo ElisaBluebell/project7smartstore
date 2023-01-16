@@ -1,18 +1,33 @@
-import
+#-*- coding: utf-8 -*-
 
-class InventoryManagement:
+from PyQt5 import QtGui
+from PyQt5.QtWidgets import QWidget, QLabel, QPushButton
+
+
+# import
+
+class InventoryManagement(QWidget):
 
     def __init__(self):
         super().__init__()
+        self.title = QLabel(self)
+        self.quit = QPushButton(self)
+        self.show()
+        self.set_ui()
 
     def set_label(self):
-        pass
+        self.title.setText('aa')
+        self.title.setGeometry(20, 20, 20, 20)
+
+        table_title = QLabel(self)
 
     def set_line(self):
         pass
 
     def set_btn(self):
-        pass
+        self.quit.setText('나가기')
+        self.quit.setGeometry(40, 40, 40, 40)
+
 
     def set_combo(self):
         pass
@@ -27,3 +42,7 @@ class InventoryManagement:
         self.set_combo()
         self.set_table()
 
+        self.setFont(QtGui.QFont('D2Coding'))
+
+    def set_db(self):
+        pass
