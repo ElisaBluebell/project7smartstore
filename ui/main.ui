@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>491</width>
+    <width>478</width>
     <height>685</height>
    </rect>
   </property>
@@ -18,12 +18,12 @@
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>451</width>
-     <height>661</height>
+     <width>450</width>
+     <height>660</height>
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="page">
     <widget class="QLabel" name="MAIN_LB_loginfo">
@@ -123,26 +123,78 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>60</y>
-       <width>411</width>
-       <height>511</height>
+       <y>110</y>
+       <width>430</width>
+       <height>471</height>
       </rect>
      </property>
      <column>
       <property name="text">
-       <string>상품명</string>
+       <string>재료명</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>상호명</string>
+       <string>량</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>판매가능갯수?</string>
+       <string>단위</string>
       </property>
      </column>
+    </widget>
+    <widget class="QPushButton" name="MAIN_BT_plus">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>81</y>
+       <width>30</width>
+       <height>30</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>+</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="MAIN_listcl">
+     <property name="geometry">
+      <rect>
+       <x>60</x>
+       <y>590</y>
+       <width>101</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>취소</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="MAIN_listcheck">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>590</y>
+       <width>101</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>확인</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineEdit">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>40</y>
+       <width>191</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="placeholderText">
+      <string>상품명</string>
+     </property>
     </widget>
    </widget>
    <widget class="QWidget" name="page_3"/>

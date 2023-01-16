@@ -17,9 +17,7 @@ class MainPage(QWidget, MainUIset):
         self.BT_setting()
         self.UserInfo = []
         self.MAIN_BT_loginout.clicked.connect(self.Move_LoginPage)
-        self.MAIN_BT_seller_order.clicked.connect(self.Move_InventoryManagement)
-        # self.MAIN_BT_test1.clicked.connect(self.Move_Store)
-        self.inventory_management = InventoryManagement()
+        self.MAIN_BT_seller_insert.clicked.connect(self.Move_test)
 
     def BT_setting(self):
         if self.LOGIN_signal == False:
@@ -39,30 +37,36 @@ class MainPage(QWidget, MainUIset):
     def Move_LoginPage(self):
         if self.LOGIN_signal:
             # 로그아웃시 초기화
+            self.LOGIN_signal = False
             self.MAIN_BT_loginout.setText('로그인')
             self.BT_setting()
             self.MAIN_LB_loginfo.clear()
             self.MAIN_LB_loginfo2.clear()
             self.UserInfo = []
-            self.LOGIN_signal = False
+
         else:
             self.PAGE_Login = LoginPage(self)
-        
-    def Move_Store(self):
+
+    def Move_test(self):
         self.MAIN_STACK.setCurrentIndex(1)
-        #db에서 등록된 상품 정보 가져오기
-        #
-        #
+        self.MAIN_strorelist.setColumnCount(3)  # 열추가
+        #헤더 크기조절
+        header = self.MAIN_strorelist.horizontalHeader()
+        header.resizeSection(0, 285)
+        header.resizeSection(1, 50)
+        header.resizeSection(2, 50)
+        self.rowplus()
+        self.MAIN_BT_plus.clicked.connect(self.rowplus)
 
-    def Move_InventoryManagement(self):
-        widget.setCurrentIndex(1)
-
-
-
-
-
-
-
+    # 동적 행 추가
+    def rowplus(self):
+        self.combobox = QComboBox()
+        self.combobox.addItem('mg')
+        self.combobox.addItem('ml')
+        self.combobox.addItem('개')
+        self.MAIN_strorelist.insertRow(self.MAIN_strorelist.rowCount())  # 동적row 추가
+        self.MAIN_strorelist.setCellWidget(self.MAIN_strorelist.rowCount() - 1, 2, self.combobox)
+        self.MAIN_strorelist.scrollToBottom()
 
 
 
