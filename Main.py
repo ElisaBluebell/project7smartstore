@@ -5,7 +5,6 @@ from PyQt5 import uic, QtWidgets
 from PyQt5.QtWidgets import *
 
 from Login import LoginPage
-from inventory_management import InventoryManagement
 
 MainUIset = uic.loadUiType("ui/main.ui")[0]
 class MainPage(QWidget, MainUIset):
