@@ -2,9 +2,9 @@ import pymysql
 from PyQt5 import uic
 from PyQt5.QtWidgets import *
 
-
-
 LoginUIset = uic.loadUiType("ui/login.ui")[0]
+
+
 class LoginPage(QWidget, LoginUIset):
     def __init__(self, parent):
         super().__init__()
@@ -17,14 +17,14 @@ class LoginPage(QWidget, LoginUIset):
         self.LOGIN_BT_login.clicked.connect(self.LoginChecking)
         self.LOGINMAIN_pass.returnPressed.connect(self.LoginChecking)
 
-
     def GO_main(self, check):
         if check:
             if self.signal_id:
                 if self.signal_pass :
                     if len(self.REGIST_name.text()) != 0:
                         if len(self.REGIST_number.text()) != 0:
-                            db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
+                            db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
+                                                 charset='utf8')
                             cursor = db.cursor()
                             if self.REGIST_radio.isChecked():
                                 if self.REGIST_adminnumber.text() == None or self.REGIST_adminnumber.text() == "" :
@@ -33,12 +33,18 @@ class LoginPage(QWidget, LoginUIset):
                                     return
 
                                 cursor.execute(
-                                    f"insert into project7smartstore.user_info (user_id,user_pw,user_name,user_tel,store_name,user_type) "
-                                    f"values('{self.REGIST_id.text()}','{self.REGIST_pass.text()}','{self.REGIST_name.text()}','{self.REGIST_number.text()}','{self.REGIST_adminnumber.text()}','{self.REGIST_radio.isChecked()}')")
+                                    f"insert into project7smartstore.user_info (user_id,user_pw,user_name,user_tel,"
+                                    f"store_name,user_type) "
+                                    f"values('{self.REGIST_id.text()}','{self.REGIST_pass.text()}',"
+                                    f"'{self.REGIST_name.text()}','{self.REGIST_number.text()}',"
+                                    f"'{self.REGIST_adminnumber.text()}','{self.REGIST_radio.isChecked()}')")
 
                             else:
-                                cursor.execute(f"insert into project7smartstore.user_info (user_id,user_pw,user_name,user_tel,user_type) "
-                                               f"values('{self.REGIST_id.text()}','{self.REGIST_pass.text()}','{self.REGIST_name.text()}','{self.REGIST_number.text()}','{self.REGIST_radio.isChecked()}')")
+                                cursor.execute(f"insert into project7smartstore.user_info (user_id,user_pw,user_name,"
+                                               f"user_tel,user_type) "
+                                               f"values('{self.REGIST_id.text()}','{self.REGIST_pass.text()}',"
+                                               f"'{self.REGIST_name.text()}','{self.REGIST_number.text()}',"
+                                               f"'{self.REGIST_radio.isChecked()}')")
                             db.commit()
                             db.close()
                             self.datareset('registsignal')
@@ -78,7 +84,6 @@ class LoginPage(QWidget, LoginUIset):
 
         else:
             QMessageBox.information(self, "알림", "ID / 비밀번호를 확인하세요.")
-
 
     #초기화 함수
     def datareset(self, signal):
@@ -139,6 +144,7 @@ class LoginPage(QWidget, LoginUIset):
         else:
             self.REGIST_LB_passcheck.setText('비밀번호가 일치하지 않습니다.')
             self.signal_pass = False
+
     def regist_adminchecker(self):
         if self.REGIST_radio.isChecked() == True:
             self.REGIST_adminnumber.setEnabled(True)

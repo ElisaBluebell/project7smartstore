@@ -7,6 +7,8 @@ from PyQt5.QtWidgets import *
 from Login import LoginPage
 
 MainUIset = uic.loadUiType("ui/main.ui")[0]
+
+
 class MainPage(QWidget, MainUIset):
     def __init__(self):
         super().__init__()
@@ -32,7 +34,6 @@ class MainPage(QWidget, MainUIset):
             else:
                 self.MAIN_BT_buyer_buy.show()
                 self.MAIN_BT_buyer_orderlist.show()
-
 
     def Move_LoginPage(self):
         if self.LOGIN_signal:
@@ -67,12 +68,6 @@ class MainPage(QWidget, MainUIset):
         self.MAIN_strorelist.insertRow(self.MAIN_strorelist.rowCount())  # 동적row 추가
         self.MAIN_strorelist.setCellWidget(self.MAIN_strorelist.rowCount() - 1, 2, self.combobox)
         self.MAIN_strorelist.scrollToBottom()
-
-
-
-
-
-
 
 
 if __name__ == '__main__':
