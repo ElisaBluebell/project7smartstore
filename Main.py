@@ -118,7 +118,8 @@ class MainPage(QWidget, MainUIset):
 
     def get_bom_table_db(self):
 
-        conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', db='project7smartstore')
+        conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
+                               db='project7smartstore')
         c = conn.cursor()
 
         c.execute('''CREATE OR REPLACE VIEW product_group 
