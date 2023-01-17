@@ -159,12 +159,16 @@ class MainPage(QWidget, MainUIset):
                 # self.table_data = [material_name, material_quantity+measure_unit, product_name GROUP BY material_name]
                 if self.bom_select_menu.currentText() in self.table_data[i][2]:
                     bom_table_row += 1
+                    bom_table_column = 0
                     self.bom_ingredient_table.setRowCount(bom_table_row)
                     for j in range(len(self.table_data[i])):
-                        self.set_bom_table_data_tooltip(i, j)
+                        print(bom_table_row)
+                        self.set_bom_table_data_tooltip(bom_table_row - 1, bom_table_column)
+                        bom_table_column += 1
 
     def set_bom_table_data_tooltip(self, row, column):
         self.bom_ingredient_table.setItem(row, column, QTableWidgetItem(self.table_data[row][column]))
+        print(self.table_data[row])
         self.bom_ingredient_table.item(row, column).setToolTip(self.table_data[row][column])
 
     def bom_to_main(self):
