@@ -1,12 +1,14 @@
 import sys
 
 import pymysql
-from PyQt5 import uic, QtWidgets
+from PyQt5 import uic
 from PyQt5.QtWidgets import *
 
 from Login import LoginPage
 
 MainUIset = uic.loadUiType("ui/main.ui")[0]
+
+
 class MainPage(QWidget, MainUIset):
     def __init__(self):
         super().__init__()
@@ -42,7 +44,6 @@ class MainPage(QWidget, MainUIset):
                 self.MAIN_BT_buyer_buy.show()
                 self.MAIN_BT_buyer_orderlist.show()
 
-
     def Move_LoginPage(self):
         if self.LOGIN_signal:
             # 로그아웃시 초기화
@@ -76,7 +77,7 @@ class MainPage(QWidget, MainUIset):
         header.resizeSection(1, 50)
         header.resizeSection(2, 50)
         self.rowplus()
-
+        self.MAIN_BT_plus.clicked.connect(self.rowplus)
 
     # 동적 행 추가
     def rowplus(self):
@@ -88,6 +89,9 @@ class MainPage(QWidget, MainUIset):
         self.MAIN_strorelist.setCellWidget(self.MAIN_strorelist.rowCount() - 1, 2, self.combobox)
         self.MAIN_strorelist.scrollToBottom()
 
+    def move_to_bill_of_material(self):
+        self.MAIN_STACK.setCurrentIndex(2)
+        self.bom_go_back.clicked.connect(self.bom_to_main)
     def datacheck(self):
         for i in range(self.MAIN_strorelist.rowCount()):
             for j in range(self.MAIN_strorelist.columnCount()-1):
@@ -121,7 +125,8 @@ class MainPage(QWidget, MainUIset):
         db.commit()
         db.close()
 
-
+    def bom_to_main(self):
+        self.MAIN_STACK.setCurrentIndex(0)
 
 
 if __name__ == '__main__':
