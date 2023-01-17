@@ -329,8 +329,6 @@ class MainPage(QWidget, MainUIset):
         self.MAIN_STACK.setCurrentIndex(0)
 
 
-
-
 if __name__ == '__main__':
     app = QApplication(sys.argv)
 
