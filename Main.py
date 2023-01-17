@@ -37,7 +37,6 @@ class MainPage(QWidget, MainUIset):
         self.table_data = []
         self.MAIN_BT_seller_order.clicked.connect(self.move_to_bill_of_material)
 
-
     def Check_order(self):
         try:
             db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
@@ -54,11 +53,11 @@ class MainPage(QWidget, MainUIset):
                            f"'{a[0][7]}','{a[0][9]}')")
             db.commit()
             db.close()
-            msg = QMessageBox.information(self, "알림", "주문완료")
+            QMessageBox.information(self, "알림", "주문완료")
             self.le_sellnum.clear()
             self.Move_SellList()
         except pymysql.err.DataError:
-            msg = QMessageBox.information(self, "알림", "정보를 입력해주세요")
+            QMessageBox.information(self, "알림", "정보를 입력해주세요")
             return
 
     def move_main(self):
@@ -146,7 +145,7 @@ class MainPage(QWidget, MainUIset):
         self.rowplus(1)
 
     # 동적 행 추가
-    def rowplus(self,signal):
+    def rowplus(self, signal):
         if signal == 1:
             self.combobox = QComboBox()
             self.combobox.addItem('g')
@@ -159,14 +158,14 @@ class MainPage(QWidget, MainUIset):
         elif signal == 0:
             if self.MAIN_strorelist.rowCount() < 2:
                 return
-            self.MAIN_strorelist.removeRow(self.MAIN_strorelist.rowCount()-1)
+            self.MAIN_strorelist.removeRow(self.MAIN_strorelist.rowCount() - 1)
 
     def datacheck(self):
         for i in range(self.MAIN_strorelist.rowCount()):
             for j in range(self.MAIN_strorelist.columnCount() - 1):
                 try:
                     if self.MAIN_strorelist.item(i, j).text() == None or \
-                            self.MAIN_strorelist.item(i,j).text() == "" or \
+                            self.MAIN_strorelist.item(i, j).text() == "" or \
                             self.MAIN_strorelist.item(i, j).text() == " ":
                         msg = QMessageBox.information(self, "알림", "정보를 입력해주세요")
                         return
@@ -203,7 +202,7 @@ class MainPage(QWidget, MainUIset):
                 cursor.execute("SELECT * FROM project7smartstore.product_info "
                                f"WHERE product_name='{self.MAIN_LE_productName.text()}' and store_name='{self.UserInfo[5]}'")
                 temp2 = cursor.fetchall()
-                if check == 0 :
+                if check == 0:
                     cursor.execute("INSERT INTO project7smartstore.bill_of_material "
                                    "(material_idx,material_name,material_quantity,measure_unit,product_idx,product_name) "
                                    f"VALUES('PJ{str(temp).zfill(4)}',"
@@ -231,7 +230,7 @@ class MainPage(QWidget, MainUIset):
                                db='project7smartstore')
         c = conn.cursor()
 
-        c. execute('SELECT * FROM `project7smartstore`.`bill_of_material`')
+        c.execute('SELECT * FROM `project7smartstore`.`bill_of_material`')
         self.material_db = c.fetchall()
 
         c.close()
