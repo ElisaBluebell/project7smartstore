@@ -124,7 +124,7 @@
       <rect>
        <x>140</x>
        <y>620</y>
-       <width>75</width>
+       <width>70</width>
        <height>23</height>
       </rect>
      </property>
@@ -195,7 +195,7 @@
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
-    <widget class="QLabel" name="bom_select_menu_2">
+    <widget class="QLabel" name="bom_menu_name">
      <property name="geometry">
       <rect>
        <x>40</x>
@@ -242,7 +242,7 @@
       <rect>
        <x>360</x>
        <y>620</y>
-       <width>75</width>
+       <width>70</width>
        <height>23</height>
       </rect>
      </property>
@@ -265,7 +265,7 @@
       </font>
      </property>
      <property name="text">
-      <string>상호명</string>
+      <string/>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -279,6 +279,40 @@
        <width>141</width>
        <height>22</height>
       </rect>
+     </property>
+    </widget>
+    <widget class="QLabel" name="bom_available">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>160</y>
+       <width>81</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>D2Coding</family>
+      </font>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="buy_ingredient_2">
+     <property name="geometry">
+      <rect>
+       <x>250</x>
+       <y>620</y>
+       <width>70</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>재료 관리</string>
      </property>
     </widget>
    </widget>
