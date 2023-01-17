@@ -5,6 +5,7 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import *
 
 from Login import LoginPage
+from buy_ingredient_window import BuyIngredient
 
 MainUIset = uic.loadUiType("ui/main.ui")[0]
 
@@ -31,10 +32,9 @@ class MainPage(QWidget, MainUIset):
         self.BT_toMain2.clicked.connect(self.move_main)
         self.BT_toBuy.clicked.connect(self.Check_order)
 
+        self.ingredient_window = BuyIngredient()
         self.material_db = ''
         self.table_data = []
-        self.MAIN_BT_loginout.clicked.connect(self.Move_LoginPage)
-        self.MAIN_BT_seller_insert.clicked.connect(self.Move_test)
         self.MAIN_BT_seller_order.clicked.connect(self.move_to_bill_of_material)
 
 
@@ -161,7 +161,6 @@ class MainPage(QWidget, MainUIset):
                 return
             self.MAIN_strorelist.removeRow(self.MAIN_strorelist.rowCount()-1)
 
-
     def datacheck(self):
         for i in range(self.MAIN_strorelist.rowCount()):
             for j in range(self.MAIN_strorelist.columnCount() - 1):
@@ -241,14 +240,13 @@ class MainPage(QWidget, MainUIset):
     def move_to_bill_of_material(self):
         self.set_material_db()
 
-        self.bom_new_menu.clicked.connect(self.Move_test)
         self.bom_go_back.clicked.connect(self.bom_to_main)
         self.buy_ingredient.clicked.connect(self.buy_ingredient_window)
 
         self.define_bom_combo_item()
         self.set_bom_table()
 
-        self.MAIN_STACK.setCurrentIndex(2)
+        self.MAIN_STACK.setCurrentIndex(1)
 
     def define_bom_combo_item(self):
         if not self.bom_select_menu.currentText():
@@ -323,6 +321,9 @@ class MainPage(QWidget, MainUIset):
     def set_bom_table_data_tooltip(self, row, column, i, j):
         self.bom_ingredient_table.setItem(row, column, QTableWidgetItem(self.table_data[i][j]))
         self.bom_ingredient_table.item(row, column).setToolTip(self.table_data[i][j])
+
+    def buy_ingredient_window(self):
+        self.ingredient_window.show()
 
     def bom_to_main(self):
         self.MAIN_STACK.setCurrentIndex(0)

@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>3</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="page">
     <widget class="QLabel" name="MAIN_LB_loginfo">
@@ -141,19 +141,6 @@
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
-    <widget class="QPushButton" name="bom_new_menu">
-     <property name="geometry">
-      <rect>
-       <x>240</x>
-       <y>620</y>
-       <width>75</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>요리 추가</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="bom_table_title">
      <property name="geometry">
       <rect>
@@ -233,7 +220,7 @@
     <widget class="QPushButton" name="buy_ingredient">
      <property name="geometry">
       <rect>
-       <x>130</x>
+       <x>210</x>
        <y>620</y>
        <width>75</width>
        <height>23</height>
