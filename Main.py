@@ -26,11 +26,37 @@ class MainPage(QWidget, MainUIset):
 
         self.MAIN_sellList.doubleClicked.connect(lambda: self.check_SellList(0))
         self.le_sellnum.textChanged.connect(lambda: self.check_SellList(1))
+        self.BT_toMain.clicked.connect(self.Move_Main)
+        self.BT_toMain2.clicked.connect(self.Move_Main)
+        self.BT_toBuy.clicked.connect(self.Check_order)
+
+
+
+    def Check_order(self):
+        db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
+        cursor = db.cursor()
+        cursor.execute("SELECT * FROM project7smartstore.user_info INNER JOIN project7smartstore.product_info "
+                       "ON project7smartstore.product_info.store_name = project7smartstore.user_info.store_name "
+                       f"WHERE project7smartstore.product_info.store_name='{self.lb_storeName2.text()}' and "
+                       f"project7smartstore.product_info.product_name='{self.lb_productname2.text()}'")
+        a = cursor.fetchall()
+        print(a)
+        cursor.execute("INSERT INTO project7smartstore.order_management "
+                       f"(product_idx,product_name,product_quantity,customer_idx,customer_name,seller_idx,seller_name,store_name) "
+                       f"values('{a[0][7]}','{a[0][8]}','{self.le_sellnum.text()}','{self.UserInfo[0]}','{self.UserInfo[3]}',"
+                       f"'{a[0][0]}','{a[0][1]}','{a[0][9]}')")
+        db.commit()
+        db.close()
+
+
+    def Move_Main(self):
+        self.MAIN_STACK.setCurrentIndex(0)
 
 
     def check_SellList(self, signal):
         if signal == 0:
             self.frame.show()
+            self.le_sellnum.clear()
             self.lb_productname2.setText(self.MAIN_sellList.item(self.MAIN_sellList.currentRow(), 0).text())
             self.lb_storeName2.setText(self.MAIN_sellList.item(self.MAIN_sellList.currentRow(), 1).text())
             self.lb_price2.setText(self.MAIN_sellList.item(self.MAIN_sellList.currentRow(), 2).text())
@@ -44,6 +70,7 @@ class MainPage(QWidget, MainUIset):
 
     def Move_SellList(self):
         self.MAIN_STACK.setCurrentIndex(3)
+        self.le_sellnum.clear()
         #판매리스트 세팅
         db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
         cursor = db.cursor()
