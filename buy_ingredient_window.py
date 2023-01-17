@@ -20,6 +20,7 @@ class BuyIngredient(QWidget):
         self.total_price = QLabel(self)
 
         self.esc = QPushButton(self)
+        self.purchase = QPushButton(self)
 
         self.select_ingredient = QComboBox(self)
         self.select_quantity = QComboBox(self)
@@ -48,6 +49,10 @@ class BuyIngredient(QWidget):
         self.esc.setText('닫기')
         self.esc.setGeometry(230, 10, 75, 23)
         self.esc.clicked.connect(self.esc_window)
+
+        self.purchase.setText('구매')
+        self.purchase.setGeometry(230, 50, 75, 23)
+        self.purchase.clicked.connect(self.purchase_ingredient)
 
     def set_combo(self):
         self.select_ingredient.setGeometry(20, 50, 90, 20)
@@ -110,8 +115,9 @@ class BuyIngredient(QWidget):
         self.calculate_total_price()
 
     def calculate_total_price(self):
-        print(self.select_quantity.currentText())
-        print(self.price_per_unit.text()[4:-1])
         if len(self.select_quantity.currentText()) != 0:
             self.total_price.setText(f'''합계: {int(self.select_quantity.currentText()[:1]) * 
                                           (int(self.price_per_unit.text()[4:-1]))}원''')
+
+    def purchase_ingredient(self):
+        pass
