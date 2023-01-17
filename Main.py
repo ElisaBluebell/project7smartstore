@@ -91,6 +91,7 @@ class MainPage(QWidget, MainUIset):
 
         self.bom_select_menu.addItem('전체')
         self.define_bom_combo_item()
+        self.set_bom_table()
 
     def define_bom_combo_item(self):
         menu = []
@@ -99,6 +100,10 @@ class MainPage(QWidget, MainUIset):
                 menu.append(item[5])
         for item in menu:
             self.bom_select_menu.addItem(item)
+
+    def set_bom_table(self):
+        self.bom_ingredient_table.clear()
+        # self.
 
     def bom_to_main(self):
         self.MAIN_STACK.setCurrentIndex(0)
