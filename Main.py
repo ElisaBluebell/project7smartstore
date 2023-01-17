@@ -114,7 +114,7 @@ class MainPage(QWidget, MainUIset):
         self.bom_ingredient_table.setColumnWidth(2, 240)
 
         self.get_bom_table_db()
-        self.bom_select_menu.currentTextChanged.connect(self.set_bom_table_data)
+        self.bom_select_menu.currentTextChanged.connect(self.set_bom_table_logic)
 
     def get_bom_table_db(self):
 
@@ -125,7 +125,7 @@ class MainPage(QWidget, MainUIset):
         AS SELECT any_value(material_idx) AS material_idx, 
         group_concat(product_name) AS product_name 
         FROM bill_of_material 
-        GROUP BY material_name''')
+        GROUP BY material_name;''')
 
         c.execute('''SELECT DISTINCT b.material_name, 
         (SELECT CONCAT(cast(b.inventory_quantity AS CHAR), a.measure_unit)) AS material_quantity, 
@@ -134,7 +134,7 @@ class MainPage(QWidget, MainUIset):
         LEFT JOIN material_management AS b 
         ON b.material_name=a.material_name 
         INNER JOIN product_group AS c 
-        ON c.material_idx=a.material_idx''')
+        ON c.material_idx=a.material_idx;''')
 
         self.table_data = c.fetchall()
         self.bom_table_default_data()
@@ -143,10 +143,9 @@ class MainPage(QWidget, MainUIset):
         self.bom_ingredient_table.setRowCount(len(self.table_data))
         for i in range(len(self.table_data)):
             for j in range(len(self.table_data[i])):
-                self.bom_ingredient_table.setItem(i, j, QTableWidgetItem(self.table_data[i][j]))
-                self.bom_ingredient_table.item(i, j).setToolTip(self.table_data[i][j])
+                self.set_bom_table_data_tooltip(i, j)
 
-    def set_bom_table_data(self):
+    def set_bom_table_logic(self):
         if self.bom_select_menu.currentText() == '전체':
             self.bom_table_default_data()
 
@@ -158,8 +157,11 @@ class MainPage(QWidget, MainUIset):
                     bom_table_row += 1
                     self.bom_ingredient_table.setRowCount(bom_table_row)
                     for j in range(len(self.table_data[i])):
-                        self.bom_ingredient_table.setItem(i, j, QTableWidgetItem(self.table_data[i][j]))
-                        self.bom_ingredient_table.item(i, j).setToolTip(self.table_data[i][j])
+                        self.set_bom_table_data_tooltip(i, j)
+
+    def set_bom_table_data_tooltip(self, row, column):
+        self.bom_ingredient_table.setItem(row, column, QTableWidgetItem(self.table_data[row][column]))
+        self.bom_ingredient_table.item(row, column).setToolTip(self.table_data[row][column])
 
     def bom_to_main(self):
         self.MAIN_STACK.setCurrentIndex(0)
