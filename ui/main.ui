@@ -354,6 +354,24 @@
        <string>요리</string>
       </property>
      </column>
+     <column>
+      <property name="text">
+       <string>구매</string>
+      </property>
+     </column>
+    </widget>
+    <widget class="QPushButton" name="buy_ingredient">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>620</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>재료 구매</string>
+     </property>
     </widget>
    </widget>
   </widget>

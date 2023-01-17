@@ -9,6 +9,7 @@ from Login import LoginPage
 MainUIset = uic.loadUiType("ui/main.ui")[0]
 
 
+
 class MainPage(QWidget, MainUIset):
     def __init__(self):
         super().__init__()
@@ -86,9 +87,10 @@ class MainPage(QWidget, MainUIset):
 
     def move_to_bill_of_material(self):
         self.set_material_db()
-
+        print(1)
         self.bom_new_menu.clicked.connect(self.Move_test)
         self.bom_go_back.clicked.connect(self.bom_to_main)
+        self.buy_ingredient.clicked.connect(self.buy_ingredient_window)
 
         self.define_bom_combo_item()
         self.set_bom_table()
@@ -164,6 +166,9 @@ class MainPage(QWidget, MainUIset):
                     for j in range(len(self.table_data[i])):
                         self.set_bom_table_data_tooltip(bom_table_row - 1, bom_table_column, i, j)
                         bom_table_column += 1
+
+    def buy_ingredient_window(self):
+        pass
 
     def set_bom_table_data_tooltip(self, row, column, i, j):
         self.bom_ingredient_table.setItem(row, column, QTableWidgetItem(self.table_data[i][j]))
