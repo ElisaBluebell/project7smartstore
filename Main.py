@@ -5,6 +5,7 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import *
 
 from Login import LoginPage
+from buy_ingredient_window import BuyIngredient
 
 MainUIset = uic.loadUiType("ui/main.ui")[0]
 
@@ -21,6 +22,7 @@ class MainPage(QWidget, MainUIset):
         self.UserInfo = []
         self.material_db = ''
         self.table_data = []
+        self.buy_ingredient_window = BuyIngredient()
         self.MAIN_BT_loginout.clicked.connect(self.Move_LoginPage)
         self.MAIN_BT_seller_insert.clicked.connect(self.Move_test)
         self.MAIN_BT_seller_order.clicked.connect(self.move_to_bill_of_material)
@@ -90,7 +92,7 @@ class MainPage(QWidget, MainUIset):
         print(1)
         self.bom_new_menu.clicked.connect(self.Move_test)
         self.bom_go_back.clicked.connect(self.bom_to_main)
-        self.buy_ingredient.clicked.connect(self.buy_ingredient_window)
+        self.buy_ingredient.clicked.connect(self.popup_buy_ingredient)
 
         self.define_bom_combo_item()
         self.set_bom_table()
@@ -167,8 +169,8 @@ class MainPage(QWidget, MainUIset):
                         self.set_bom_table_data_tooltip(bom_table_row - 1, bom_table_column, i, j)
                         bom_table_column += 1
 
-    def buy_ingredient_window(self):
-        pass
+    def popup_buy_ingredient(self):
+        self.buy_ingredient_window.show()
 
     def set_bom_table_data_tooltip(self, row, column, i, j):
         self.bom_ingredient_table.setItem(row, column, QTableWidgetItem(self.table_data[i][j]))
