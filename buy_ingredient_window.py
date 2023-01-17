@@ -2,7 +2,7 @@ import pymysql
 
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QComboBox
+from PyQt5.QtWidgets import QWidget, QApplication, QLabel, QPushButton, QComboBox
 
 
 class BuyIngredient(QWidget):
