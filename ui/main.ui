@@ -118,26 +118,12 @@
      </property>
     </widget>
    </widget>
-   <widget class="QWidget" name="page_2"/>
-   <widget class="QWidget" name="page_3">
-    <widget class="QPushButton" name="MAIN_listcheck">
-     <property name="geometry">
-      <rect>
-       <x>240</x>
-       <y>580</y>
-       <width>101</width>
-       <height>51</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>확인</string>
-     </property>
-    </widget>
+   <widget class="QWidget" name="page_2">
     <widget class="QTableWidget" name="MAIN_strorelist">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>100</y>
+       <y>110</y>
        <width>430</width>
        <height>471</height>
       </rect>
@@ -149,7 +135,7 @@
      </column>
      <column>
       <property name="text">
-       <string>량</string>
+       <string>수량</string>
       </property>
      </column>
      <column>
@@ -162,7 +148,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>71</y>
+       <y>81</y>
        <width>30</width>
        <height>30</height>
       </rect>
@@ -175,7 +161,7 @@
      <property name="geometry">
       <rect>
        <x>60</x>
-       <y>580</y>
+       <y>590</y>
        <width>101</width>
        <height>51</height>
       </rect>
@@ -184,81 +170,20 @@
       <string>취소</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="MAIN_BT_minus">
+    <widget class="QPushButton" name="MAIN_listcheck">
      <property name="geometry">
       <rect>
-       <x>38</x>
-       <y>71</y>
-       <width>30</width>
-       <height>30</height>
+       <x>240</x>
+       <y>590</y>
+       <width>101</width>
+       <height>51</height>
       </rect>
      </property>
      <property name="text">
-      <string>-</string>
+      <string>확인</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="MAIN_LE_productName">
-     <property name="geometry">
-      <rect>
-       <x>40</x>
-       <y>30</y>
-       <width>161</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="placeholderText">
-      <string>상품명</string>
-     </property>
-    </widget>
-    <widget class="QLineEdit" name="MAIN_LE_productPrice">
-     <property name="geometry">
-      <rect>
-       <x>210</x>
-       <y>30</y>
-       <width>161</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="placeholderText">
-      <string>가격</string>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="page_4">
-    <widget class="QTableWidget" name="MAIN_sellList">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>110</y>
-       <width>430</width>
-       <height>341</height>
-      </rect>
-     </property>
-     <property name="editTriggers">
-      <set>QAbstractItemView::NoEditTriggers</set>
-     </property>
-     <column>
-      <property name="text">
-       <string>제품명</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>상호명</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>가격</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>판매가능갯수</string>
-      </property>
-     </column>
-    </widget>
-    <widget class="QLineEdit" name="MAIN_LE_sellName">
+    <widget class="QLineEdit" name="MAIN_name">
      <property name="geometry">
       <rect>
        <x>130</x>
@@ -271,189 +196,181 @@
       <string>상품명</string>
      </property>
     </widget>
-    <widget class="QFrame" name="frame">
+   </widget>
+   <widget class="QWidget" name="page_3">
+    <widget class="QLabel" name="bom_store_name">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>460</y>
-       <width>431</width>
-       <height>191</height>
+       <x>0</x>
+       <y>30</y>
+       <width>451</width>
+       <height>31</height>
       </rect>
      </property>
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
+     <property name="font">
+      <font>
+       <pointsize>16</pointsize>
+      </font>
      </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
+     <property name="text">
+      <string>상호명</string>
      </property>
-     <widget class="QLabel" name="lb_productname">
-      <property name="geometry">
-       <rect>
-        <x>90</x>
-        <y>30</y>
-        <width>41</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>상품명</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="lb_productname2">
-      <property name="geometry">
-       <rect>
-        <x>150</x>
-        <y>30</y>
-        <width>101</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>상품명</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="lb_productnum">
-      <property name="geometry">
-       <rect>
-        <x>90</x>
-        <y>90</y>
-        <width>41</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>수량</string>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="le_sellnum">
-      <property name="geometry">
-       <rect>
-        <x>150</x>
-        <y>97</y>
-        <width>101</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="maxLength">
-       <number>4</number>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="BT_toMain2">
-      <property name="geometry">
-       <rect>
-        <x>80</x>
-        <y>140</y>
-        <width>75</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>취소</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="BT_toBuy">
-      <property name="geometry">
-       <rect>
-        <x>250</x>
-        <y>140</y>
-        <width>75</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>구매</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="lb_price">
-      <property name="geometry">
-       <rect>
-        <x>90</x>
-        <y>60</y>
-        <width>41</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>금액</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="lb_price2">
-      <property name="geometry">
-       <rect>
-        <x>150</x>
-        <y>60</y>
-        <width>91</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>금액</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="lb_storeName">
-      <property name="geometry">
-       <rect>
-        <x>90</x>
-        <y>0</y>
-        <width>41</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>상호명</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="lb_storeName2">
-      <property name="geometry">
-       <rect>
-        <x>150</x>
-        <y>0</y>
-        <width>101</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>상품명</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="lb_totalPrice">
-      <property name="geometry">
-       <rect>
-        <x>270</x>
-        <y>90</y>
-        <width>81</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>금액</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="lb_totalPrice2">
-      <property name="geometry">
-       <rect>
-        <x>340</x>
-        <y>90</y>
-        <width>21</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>원</string>
-      </property>
-     </widget>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
     </widget>
-    <widget class="QPushButton" name="BT_toMain">
+    <widget class="QPushButton" name="bom_go_back">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>10</y>
+       <x>350</x>
+       <y>620</y>
        <width>75</width>
        <height>23</height>
       </rect>
      </property>
      <property name="text">
-      <string>메인</string>
+      <string>나가기</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="bom_select_menu_2">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>160</y>
+       <width>41</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>D2Coding</family>
+      </font>
+     </property>
+     <property name="text">
+      <string>메뉴명</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QLabel" name="bom_title">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>80</y>
+       <width>451</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>D2Coding</family>
+       <pointsize>18</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>재료 재고 관리</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="bom_new_menu">
+     <property name="geometry">
+      <rect>
+       <x>240</x>
+       <y>620</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>요리 추가</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="bom_table_title">
+     <property name="geometry">
+      <rect>
+       <x>350</x>
+       <y>160</y>
+       <width>71</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>D2Coding</family>
+      </font>
+     </property>
+     <property name="text">
+      <string>재료 현황표</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="bom_select_menu">
+     <property name="geometry">
+      <rect>
+       <x>70</x>
+       <y>160</y>
+       <width>141</width>
+       <height>22</height>
+      </rect>
+     </property>
+    </widget>
+    <widget class="QTableWidget" name="bom_ingredient_table">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>190</y>
+       <width>391</width>
+       <height>411</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>D2Coding</family>
+      </font>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <attribute name="horizontalHeaderCascadingSectionResizes">
+      <bool>false</bool>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>재료명</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>수량</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>요리</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>구매</string>
+      </property>
+     </column>
+    </widget>
+    <widget class="QPushButton" name="buy_ingredient">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>620</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>재료 구매</string>
      </property>
     </widget>
    </widget>
