@@ -20,17 +20,16 @@ class MainPage(QWidget, MainUIset):
         self.UserInfo = []
         self.MAIN_BT_loginout.clicked.connect(self.Move_LoginPage)
         self.MAIN_BT_seller_insert.clicked.connect(self.Move_test)
-        self.MAIN_BT_plus.clicked.connect(self.rowplus)
+        self.MAIN_BT_plus.clicked.connect(lambda: self.rowplus(1))
+        self.MAIN_BT_minus.clicked.connect(lambda: self.rowplus(0))
         self.MAIN_listcheck.clicked.connect(self.datacheck)
         self.MAIN_BT_buyer_buy.clicked.connect(self.Move_SellList)
 
-        self.MAIN_sellList.doubleClicked.connect(lambda: self.check_SellList(0))
-        self.le_sellnum.textChanged.connect(lambda: self.check_SellList(1))
-        self.BT_toMain.clicked.connect(self.Move_Main)
-        self.BT_toMain2.clicked.connect(self.Move_Main)
+        self.MAIN_sellList.doubleClicked.connect(lambda: self.check_selllist(0))
+        self.le_sellnum.textChanged.connect(lambda: self.check_selllist(1))
+        self.BT_toMain.clicked.connect(self.move_main)
+        self.BT_toMain2.clicked.connect(self.move_main)
         self.BT_toBuy.clicked.connect(self.Check_order)
-
-
 
     def Check_order(self):
         db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
@@ -48,12 +47,10 @@ class MainPage(QWidget, MainUIset):
         db.commit()
         db.close()
 
-
-    def Move_Main(self):
+    def move_main(self):
         self.MAIN_STACK.setCurrentIndex(0)
 
-
-    def check_SellList(self, signal):
+    def check_selllist(self, signal):
         if signal == 0:
             self.frame.show()
             self.le_sellnum.clear()
@@ -63,7 +60,7 @@ class MainPage(QWidget, MainUIset):
         elif signal == 1:
             try:
                 self.lb_totalPrice2.show()
-                self.lb_totalPrice.setText(f"{int(self.le_sellnum.text())*int(self.lb_price2.text())}")
+                self.lb_totalPrice.setText(f"{int(self.le_sellnum.text()) * int(self.lb_price2.text())}")
             except:
                 self.lb_totalPrice.setText(" ")
                 self.lb_totalPrice2.hide()
@@ -71,7 +68,7 @@ class MainPage(QWidget, MainUIset):
     def Move_SellList(self):
         self.MAIN_STACK.setCurrentIndex(3)
         self.le_sellnum.clear()
-        #판매리스트 세팅
+        # 판매리스트 세팅
         db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
         cursor = db.cursor()
         num = cursor.execute("SELECT * FROM project7smartstore.user_info inner JOIN project7smartstore.product_info "
@@ -113,11 +110,11 @@ class MainPage(QWidget, MainUIset):
         else:
             self.PAGE_Login = LoginPage(self)
 
-
-    def Move_reset(self,signal):
+    def Move_reset(self, signal):
         if signal == 0:
             self.MAIN_STACK.setCurrentIndex(0)
-            self.MAIN_name.clear()
+            self.MAIN_LE_productName.clear()
+            self.MAIN_LE_productPrice.clear()
             self.MAIN_strorelist.clearContents()
             self.MAIN_strorelist.setRowCount(0)
 
@@ -127,24 +124,28 @@ class MainPage(QWidget, MainUIset):
         self.MAIN_listcl.clicked.connect(lambda: self.Move_reset(0))
 
         self.MAIN_strorelist.setColumnCount(3)  # 열추가
-        #헤더 크기조절
+        # 헤더 크기조절
         header = self.MAIN_strorelist.horizontalHeader()
         header.resizeSection(0, 285)
         header.resizeSection(1, 50)
         header.resizeSection(2, 50)
-        self.rowplus()
-        self.MAIN_BT_plus.clicked.connect(self.rowplus)
+        self.rowplus(1)
 
     # 동적 행 추가
-    def rowplus(self):
-        self.combobox = QComboBox()
-        self.combobox.addItem('g')
-        self.combobox.addItem('mg')
-        self.combobox.addItem('ml')
-        self.combobox.addItem('개')
-        self.MAIN_strorelist.insertRow(self.MAIN_strorelist.rowCount())  # 동적row 추가
-        self.MAIN_strorelist.setCellWidget(self.MAIN_strorelist.rowCount() - 1, 2, self.combobox)
-        self.MAIN_strorelist.scrollToBottom()
+    def rowplus(self,signal):
+        if signal == 1:
+            self.combobox = QComboBox()
+            self.combobox.addItem('g')
+            self.combobox.addItem('mg')
+            self.combobox.addItem('ml')
+            self.combobox.addItem('개')
+            self.MAIN_strorelist.insertRow(self.MAIN_strorelist.rowCount())  # 동적row 추가
+            self.MAIN_strorelist.setCellWidget(self.MAIN_strorelist.rowCount() - 1, 2, self.combobox)
+            self.MAIN_strorelist.scrollToBottom()
+        elif signal == 0:
+            if self.MAIN_strorelist.rowCount() < 2:
+                return
+            self.MAIN_strorelist.removeRow(self.MAIN_strorelist.rowCount()-1)
 
     def move_to_bill_of_material(self):
         self.MAIN_STACK.setCurrentIndex(2)
@@ -152,33 +153,66 @@ class MainPage(QWidget, MainUIset):
 
     def datacheck(self):
         for i in range(self.MAIN_strorelist.rowCount()):
-            for j in range(self.MAIN_strorelist.columnCount()-1):
+            for j in range(self.MAIN_strorelist.columnCount() - 1):
                 try:
-                    if self.MAIN_strorelist.item(i, j).text() == None or self.MAIN_strorelist.item(i, j).text() == "" or self.MAIN_strorelist.item(i, j).text() == " ":
+                    if self.MAIN_strorelist.item(i, j).text() == None or \
+                            self.MAIN_strorelist.item(i,j).text() == "" or \
+                            self.MAIN_strorelist.item(i, j).text() == " ":
                         msg = QMessageBox.information(self, "알림", "정보를 입력해주세요")
                         return
                 except:
                     msg = QMessageBox.information(self, "알림", "정보를 입력해주세요")
                     return
 
-        db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
-        cursor = db.cursor()
-        for i in range(self.MAIN_strorelist.rowCount()):
-            cursor.execute("SELECT MAX(indexnum) FROM project7smartstore.bill_of_material")
-            try:
-                temp = int(cursor.fetchone()[0])+1
-            except:
-                temp = 1
-            try:
-                cursor.execute("insert into project7smartstore.bill_of_material "
-                               "(material_idx,material_name,material_quantity,measure_unit) "
-                               f"VALUES('PJ{str(temp).zfill(6)}',"
-                               f"'{self.MAIN_strorelist.item(i, 0).text()}',"
-                               f"'{self.MAIN_strorelist.item(i, 1).text()}',"
-                               f"'{self.MAIN_strorelist.cellWidget(i, 2).currentText()}')")
-            except:
-                msg = QMessageBox.information(self, "알림", "잘못된 정보입니다. 확인해주세요.")
+        try:
+            db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
+            cursor = db.cursor()
+            # 제품명 존재하는지 체크
+            test = cursor.execute("SELECT product_idx FROM project7smartstore.product_info "
+                                  f"WHERE product_name='{self.MAIN_LE_productName.text()}'")
+            print(test, "test")
+            if test != 0:
+                msg = QMessageBox.information(self, "알림", "이미 존재합니다.")
                 return
+            cursor.execute("INSERT INTO project7smartstore.product_info "
+                           f"(product_name,store_name,product_price) "
+                           f"VALUES('{self.MAIN_LE_productName.text()}','{self.UserInfo[5]}','{self.MAIN_LE_productPrice.text()}')")
+            # db.commit()
+
+            for i in range(self.MAIN_strorelist.rowCount()):
+                cursor.execute("SELECT MAX(indexnum) FROM project7smartstore.bill_of_material")
+                try:
+                    temp = int(cursor.fetchone()[0]) + 1
+                except:
+                    temp = 1
+
+                check = cursor.execute("SELECT material_idx FROM project7smartstore.bill_of_material "
+                                       f"WHERE material_name = '{self.MAIN_strorelist.item(i, 0).text()}'")
+                info = cursor.fetchall()
+
+                cursor.execute("SELECT * FROM project7smartstore.product_info "
+                               f"WHERE product_name='{self.MAIN_LE_productName.text()}' and store_name='{self.UserInfo[5]}'")
+                temp2 = cursor.fetchall()
+                if check == 0 :
+                    cursor.execute("INSERT INTO project7smartstore.bill_of_material "
+                                   "(material_idx,material_name,material_quantity,measure_unit,product_idx,product_name) "
+                                   f"VALUES('PJ{str(temp).zfill(4)}',"
+                                   f"'{self.MAIN_strorelist.item(i, 0).text()}',"
+                                   f"'{self.MAIN_strorelist.item(i, 1).text()}',"
+                                   f"'{self.MAIN_strorelist.cellWidget(i, 2).currentText()}',"
+                                   f"'{temp2[0][0]}','{temp2[0][1]}')")
+                else:
+                    cursor.execute("insert into project7smartstore.bill_of_material "
+                                   "(material_idx,material_name,material_quantity,measure_unit,product_idx,product_name) "
+                                   f"VALUES('{info[0][0]}',"
+                                   f"'{self.MAIN_strorelist.item(i, 0).text()}',"
+                                   f"'{self.MAIN_strorelist.item(i, 1).text()}',"
+                                   f"'{self.MAIN_strorelist.cellWidget(i, 2).currentText()}',"
+                                   f"'{temp2[0][0]}','{temp2[0][1]}')")
+
+        except:
+            msg = QMessageBox.information(self, "알림", "잘못된 정보입니다. 확인해주세요.")
+            return
         db.commit()
         db.close()
 
