@@ -93,10 +93,10 @@ class MainPage(QWidget, MainUIset):
             for j in range(self.MAIN_strorelist.columnCount()-1):
                 try:
                     if self.MAIN_strorelist.item(i, j).text() == None or self.MAIN_strorelist.item(i, j).text() == "" or self.MAIN_strorelist.item(i, j).text() == " ":
-                        msg = QMessageBox.information(self, "알림", "정보를 채워주세요")
+                        msg = QMessageBox.information(self, "알림", "정보를 입력해주세요")
                         return
                 except:
-                    msg = QMessageBox.information(self, "알림", "정보를 채워주세요")
+                    msg = QMessageBox.information(self, "알림", "정보를 입력해주세요")
                     return
 
 
@@ -108,12 +108,16 @@ class MainPage(QWidget, MainUIset):
                 temp = int(cursor.fetchone()[0])+1
             except:
                 temp = 1
-            cursor.execute("insert into project7smartstore.bill_of_material "
-                           "(material_idx,material_name,material_quantity,measure_unit) "
-                           f"VALUES('PJ{str(temp).zfill(6)}',"
-                           f"'{self.MAIN_strorelist.item(i, 0).text()}',"
-                           f"'{self.MAIN_strorelist.item(i, 1).text()}',"
-                           f"'{self.MAIN_strorelist.cellWidget(i, 2).currentText()}')")
+            try:
+                cursor.execute("insert into project7smartstore.bill_of_material "
+                               "(material_idx,material_name,material_quantity,measure_unit) "
+                               f"VALUES('PJ{str(temp).zfill(6)}',"
+                               f"'{self.MAIN_strorelist.item(i, 0).text()}',"
+                               f"'{self.MAIN_strorelist.item(i, 1).text()}',"
+                               f"'{self.MAIN_strorelist.cellWidget(i, 2).currentText()}')")
+            except:
+                msg = QMessageBox.information(self, "알림", "잘못된 정보입니다. 확인해주세요.")
+                return
         db.commit()
         db.close()
 

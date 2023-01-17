@@ -183,7 +183,7 @@
       <string>확인</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="MAIN_name">
+    <widget class="QLineEdit" name="MAIN_LE_productName">
      <property name="geometry">
       <rect>
        <x>130</x>
