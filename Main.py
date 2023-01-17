@@ -19,6 +19,7 @@ class MainPage(QWidget, MainUIset):
         self.BT_setting()
         self.UserInfo = []
         self.material_db = ''
+        self.table_data = []
         self.MAIN_BT_loginout.clicked.connect(self.Move_LoginPage)
         self.MAIN_BT_seller_insert.clicked.connect(self.Move_test)
         self.MAIN_BT_seller_order.clicked.connect(self.move_to_bill_of_material)
@@ -73,7 +74,8 @@ class MainPage(QWidget, MainUIset):
         self.MAIN_strorelist.scrollToBottom()
 
     def set_material_db(self):
-        conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', db='project7smartstore')
+        conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
+                               db='project7smartstore')
         c = conn.cursor()
 
         c. execute('SELECT * FROM `project7smartstore`.`bill_of_material`')
@@ -83,28 +85,81 @@ class MainPage(QWidget, MainUIset):
         conn.close()
 
     def move_to_bill_of_material(self):
-        self.MAIN_STACK.setCurrentIndex(2)
         self.set_material_db()
 
         self.bom_new_menu.clicked.connect(self.Move_test)
         self.bom_go_back.clicked.connect(self.bom_to_main)
 
-        self.bom_select_menu.addItem('전체')
         self.define_bom_combo_item()
         self.set_bom_table()
 
+        self.MAIN_STACK.setCurrentIndex(2)
+
     def define_bom_combo_item(self):
-        menu = []
-        for item in self.material_db:
-            if item[5] not in menu:
-                menu.append(item[5])
-        for item in menu:
-            self.bom_select_menu.addItem(item)
+        if not self.bom_select_menu.currentText():
+            self.bom_select_menu.addItem('전체')
+            menu = []
+            for item in self.material_db:
+                if item[6] not in menu:
+                    menu.append(item[6])
+            for item in menu:
+                if item:
+                    self.bom_select_menu.addItem(item)
 
     def set_bom_table(self):
-        self.bom_ingredient_table.setColumnWidth(0, 80)
-        self.bom_ingredient_table.setColumnWidth(1, 69)
+
+        self.bom_ingredient_table.verticalHeader().setVisible(False)
+        self.bom_ingredient_table.setColumnWidth(0, 72)
+        self.bom_ingredient_table.setColumnWidth(1, 60)
         self.bom_ingredient_table.setColumnWidth(2, 240)
+
+        self.get_bom_table_db()
+        self.bom_select_menu.currentTextChanged.connect(self.set_bom_table_data)
+
+    def get_bom_table_db(self):
+
+        conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', db='project7smartstore')
+        c = conn.cursor()
+
+        c.execute('''CREATE OR REPLACE VIEW product_group 
+        AS SELECT any_value(material_idx) AS material_idx, 
+        group_concat(product_name) AS product_name 
+        FROM bill_of_material 
+        GROUP BY material_name''')
+
+        c.execute('''SELECT DISTINCT b.material_name, 
+        (SELECT CONCAT(cast(b.inventory_quantity AS CHAR), a.measure_unit)) AS material_quantity, 
+        c.product_name 
+        FROM bill_of_material AS a 
+        LEFT JOIN material_management AS b 
+        ON b.material_name=a.material_name 
+        INNER JOIN product_group AS c 
+        ON c.material_idx=a.material_idx''')
+
+        self.table_data = c.fetchall()
+        self.bom_table_default_data()
+
+    def bom_table_default_data(self):
+        self.bom_ingredient_table.setRowCount(len(self.table_data))
+        for i in range(len(self.table_data)):
+            for j in range(len(self.table_data[i])):
+                self.bom_ingredient_table.setItem(i, j, QTableWidgetItem(self.table_data[i][j]))
+                self.bom_ingredient_table.item(i, j).setToolTip(self.table_data[i][j])
+
+    def set_bom_table_data(self):
+        if self.bom_select_menu.currentText() == '전체':
+            self.bom_table_default_data()
+
+        else:
+            bom_table_row = 0
+            self.bom_ingredient_table.setRowCount(bom_table_row)
+            for i in range(len(self.table_data)):
+                if self.bom_select_menu.currentText() in self.table_data[i][2]:
+                    bom_table_row += 1
+                    self.bom_ingredient_table.setRowCount(bom_table_row)
+                    for j in range(len(self.table_data[i])):
+                        self.bom_ingredient_table.setItem(i, j, QTableWidgetItem(self.table_data[i][j]))
+                        self.bom_ingredient_table.item(i, j).setToolTip(self.table_data[i][j])
 
     def bom_to_main(self):
         self.MAIN_STACK.setCurrentIndex(0)

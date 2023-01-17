@@ -333,6 +333,12 @@
        <family>D2Coding</family>
       </font>
      </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <attribute name="horizontalHeaderCascadingSectionResizes">
+      <bool>false</bool>
+     </attribute>
      <column>
       <property name="text">
        <string>재료명</string>
