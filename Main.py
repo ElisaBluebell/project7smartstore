@@ -32,20 +32,27 @@ class MainPage(QWidget, MainUIset):
         self.BT_toBuy.clicked.connect(self.Check_order)
 
     def Check_order(self):
-        db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
-        cursor = db.cursor()
-        cursor.execute("SELECT * FROM project7smartstore.user_info INNER JOIN project7smartstore.product_info "
-                       "ON project7smartstore.product_info.store_name = project7smartstore.user_info.store_name "
-                       f"WHERE project7smartstore.product_info.store_name='{self.lb_storeName2.text()}' and "
-                       f"project7smartstore.product_info.product_name='{self.lb_productname2.text()}'")
-        a = cursor.fetchall()
-        print(a)
-        cursor.execute("INSERT INTO project7smartstore.order_management "
-                       f"(product_idx,product_name,product_quantity,customer_idx,customer_name,seller_idx,seller_name,store_name) "
-                       f"values('{a[0][7]}','{a[0][8]}','{self.le_sellnum.text()}','{self.UserInfo[0]}','{self.UserInfo[3]}',"
-                       f"'{a[0][0]}','{a[0][1]}','{a[0][9]}')")
-        db.commit()
-        db.close()
+        try:
+            db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
+            cursor = db.cursor()
+            cursor.execute("SELECT * FROM project7smartstore.user_info INNER JOIN project7smartstore.product_info "
+                           "ON project7smartstore.product_info.store_name = project7smartstore.user_info.store_name "
+                           f"WHERE project7smartstore.product_info.store_name='{self.lb_storeName2.text()}' and "
+                           f"project7smartstore.product_info.product_name='{self.lb_productname2.text()}'")
+            a = cursor.fetchall()
+            print(a)
+            cursor.execute("INSERT INTO project7smartstore.order_management "
+                           f"(product_idx,product_name,product_quantity,customer_idx,seller_idx,store_name) "
+                           f"values('{a[0][7]}','{a[0][8]}','{self.le_sellnum.text()}','{self.UserInfo[0]}',"
+                           f"'{a[0][7]}','{a[0][9]}')")
+            db.commit()
+            db.close()
+            msg = QMessageBox.information(self, "알림", "주문완료")
+            self.le_sellnum.clear()
+            self.Move_SellList()
+        except pymysql.err.DataError:
+            msg = QMessageBox.information(self, "알림", "정보를 입력해주세요")
+            return
 
     def move_main(self):
         self.MAIN_STACK.setCurrentIndex(0)
@@ -119,7 +126,7 @@ class MainPage(QWidget, MainUIset):
             self.MAIN_strorelist.setRowCount(0)
 
     def Move_test(self):
-        self.MAIN_STACK.setCurrentIndex(1)
+        self.MAIN_STACK.setCurrentIndex(2)
 
         self.MAIN_listcl.clicked.connect(lambda: self.Move_reset(0))
 
@@ -147,9 +154,6 @@ class MainPage(QWidget, MainUIset):
                 return
             self.MAIN_strorelist.removeRow(self.MAIN_strorelist.rowCount()-1)
 
-    def move_to_bill_of_material(self):
-        self.MAIN_STACK.setCurrentIndex(2)
-        self.bom_go_back.clicked.connect(self.bom_to_main)
 
     def datacheck(self):
         for i in range(self.MAIN_strorelist.rowCount()):
@@ -160,7 +164,7 @@ class MainPage(QWidget, MainUIset):
                             self.MAIN_strorelist.item(i, j).text() == " ":
                         msg = QMessageBox.information(self, "알림", "정보를 입력해주세요")
                         return
-                except:
+                except AttributeError:
                     msg = QMessageBox.information(self, "알림", "정보를 입력해주세요")
                     return
 
@@ -183,7 +187,7 @@ class MainPage(QWidget, MainUIset):
                 cursor.execute("SELECT MAX(indexnum) FROM project7smartstore.bill_of_material")
                 try:
                     temp = int(cursor.fetchone()[0]) + 1
-                except:
+                except TypeError:
                     temp = 1
 
                 check = cursor.execute("SELECT material_idx FROM project7smartstore.bill_of_material "
@@ -210,7 +214,7 @@ class MainPage(QWidget, MainUIset):
                                    f"'{self.MAIN_strorelist.cellWidget(i, 2).currentText()}',"
                                    f"'{temp2[0][0]}','{temp2[0][1]}')")
 
-        except:
+        except AttributeError:
             msg = QMessageBox.information(self, "알림", "잘못된 정보입니다. 확인해주세요.")
             return
         db.commit()
