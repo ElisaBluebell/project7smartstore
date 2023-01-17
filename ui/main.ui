@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="page">
     <widget class="QLabel" name="MAIN_LB_loginfo">
@@ -119,188 +119,11 @@
     </widget>
    </widget>
    <widget class="QWidget" name="page_2">
-    <widget class="QLabel" name="bom_title">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>80</y>
-       <width>451</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>D2Coding</family>
-       <pointsize>18</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>재료 재고 관리</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-    <widget class="QLabel" name="bom_table_title">
-     <property name="geometry">
-      <rect>
-       <x>350</x>
-       <y>160</y>
-       <width>71</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>D2Coding</family>
-      </font>
-     </property>
-     <property name="text">
-      <string>재료 현황표</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-    <widget class="QLabel" name="bom_store_name">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>30</y>
-       <width>451</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>16</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>상호명</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-    <widget class="QLabel" name="bom_select_menu_2">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>160</y>
-       <width>41</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>D2Coding</family>
-      </font>
-     </property>
-     <property name="text">
-      <string>메뉴명</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="bom_go_back">
-     <property name="geometry">
-      <rect>
-       <x>350</x>
-       <y>620</y>
-       <width>75</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>나가기</string>
-     </property>
-    </widget>
-    <widget class="QPushButton" name="buy_ingredient">
-     <property name="geometry">
-      <rect>
-       <x>210</x>
-       <y>620</y>
-       <width>75</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>재료 구매</string>
-     </property>
-    </widget>
-    <widget class="QTableWidget" name="bom_ingredient_table">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>190</y>
-       <width>391</width>
-       <height>411</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>D2Coding</family>
-      </font>
-     </property>
-     <property name="editTriggers">
-      <set>QAbstractItemView::NoEditTriggers</set>
-     </property>
-     <attribute name="horizontalHeaderCascadingSectionResizes">
-      <bool>false</bool>
-     </attribute>
-     <column>
-      <property name="text">
-       <string>재료명</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>수량</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>요리</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>구매</string>
-      </property>
-     </column>
-    </widget>
-    <widget class="QComboBox" name="bom_select_menu">
-     <property name="geometry">
-      <rect>
-       <x>70</x>
-       <y>160</y>
-       <width>141</width>
-       <height>22</height>
-      </rect>
-     </property>
-    </widget>
-   </widget>
-   <widget class="QWidget" name="page_3">
-    <widget class="QPushButton" name="MAIN_listcheck">
-     <property name="geometry">
-      <rect>
-       <x>240</x>
-       <y>580</y>
-       <width>101</width>
-       <height>51</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>확인</string>
-     </property>
-    </widget>
     <widget class="QTableWidget" name="MAIN_strorelist">
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>100</y>
+       <y>110</y>
        <width>430</width>
        <height>471</height>
       </rect>
@@ -325,7 +148,7 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>71</y>
+       <y>81</y>
        <width>30</width>
        <height>30</height>
       </rect>
@@ -338,7 +161,7 @@
      <property name="geometry">
       <rect>
        <x>60</x>
-       <y>580</y>
+       <y>590</y>
        <width>101</width>
        <height>51</height>
       </rect>
@@ -347,25 +170,25 @@
       <string>취소</string>
      </property>
     </widget>
-    <widget class="QPushButton" name="MAIN_BT_minus">
+    <widget class="QPushButton" name="MAIN_listcheck">
      <property name="geometry">
       <rect>
-       <x>38</x>
-       <y>71</y>
-       <width>30</width>
-       <height>30</height>
+       <x>240</x>
+       <y>590</y>
+       <width>101</width>
+       <height>51</height>
       </rect>
      </property>
      <property name="text">
-      <string>-</string>
+      <string>확인</string>
      </property>
     </widget>
     <widget class="QLineEdit" name="MAIN_LE_productName">
      <property name="geometry">
       <rect>
-       <x>40</x>
-       <y>30</y>
-       <width>161</width>
+       <x>130</x>
+       <y>40</y>
+       <width>191</width>
        <height>41</height>
       </rect>
      </property>
@@ -373,20 +196,8 @@
       <string>상품명</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="MAIN_LE_productPrice">
-     <property name="geometry">
-      <rect>
-       <x>210</x>
-       <y>30</y>
-       <width>161</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="placeholderText">
-      <string>가격</string>
-     </property>
-    </widget>
    </widget>
+   <widget class="QWidget" name="page_3"/>
    <widget class="QWidget" name="page_4">
     <widget class="QTableWidget" name="MAIN_sellList">
      <property name="geometry">

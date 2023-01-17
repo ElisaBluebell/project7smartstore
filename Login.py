@@ -27,24 +27,32 @@ class LoginPage(QWidget, LoginUIset):
                                                  charset='utf8')
                             cursor = db.cursor()
                             if self.REGIST_radio.isChecked():
-                                if self.REGIST_adminnumber.text() == None or self.REGIST_adminnumber.text() == "" :
+                                if len(self.REGIST_storeName.text()) == 0 :
                                     QMessageBox.information(self, "알림", "상호명을 입력하세요")
                                     db.close()
                                     return
-
-                                cursor.execute(
-                                    f"insert into project7smartstore.user_info (user_id,user_pw,user_name,user_tel,"
-                                    f"store_name,user_type) "
-                                    f"values('{self.REGIST_id.text()}','{self.REGIST_pass.text()}',"
-                                    f"'{self.REGIST_name.text()}','{self.REGIST_number.text()}',"
-                                    f"'{self.REGIST_adminnumber.text()}','{self.REGIST_radio.isChecked()}')")
-
+                                member = 'seller'
+                                try:
+                                    cursor.execute(
+                                        f"insert into project7smartstore.user_info (user_id,user_pw,user_name,user_tel,"
+                                        f"store_name,user_type) "
+                                        f"values('{self.REGIST_id.text()}','{self.REGIST_pass.text()}',"
+                                        f"'{self.REGIST_name.text()}','{self.REGIST_number.text()}',"
+                                        f"'{self.REGIST_storeName.text()}','{member}')")
+                                except:
+                                    QMessageBox.information(self, "알림", "잘못된 입력입니다.")
+                                    return
                             else:
-                                cursor.execute(f"insert into project7smartstore.user_info (user_id,user_pw,user_name,"
-                                               f"user_tel,user_type) "
-                                               f"values('{self.REGIST_id.text()}','{self.REGIST_pass.text()}',"
-                                               f"'{self.REGIST_name.text()}','{self.REGIST_number.text()}',"
-                                               f"'{self.REGIST_radio.isChecked()}')")
+                                member = 'buyer'
+                                try:
+                                    cursor.execute(f"insert into project7smartstore.user_info (user_id,user_pw,user_name,"
+                                                   f"user_tel,user_type) "
+                                                   f"values('{self.REGIST_id.text()}','{self.REGIST_pass.text()}',"
+                                                   f"'{self.REGIST_name.text()}','{self.REGIST_number.text()}',"
+                                                   f"'{member}')")
+                                except:
+                                    QMessageBox.information(self, "알림", "잘못된 입력입니다.")
+                                    return
                             db.commit()
                             db.close()
                             self.datareset('registsignal')
@@ -147,9 +155,9 @@ class LoginPage(QWidget, LoginUIset):
 
     def regist_adminchecker(self):
         if self.REGIST_radio.isChecked() == True:
-            self.REGIST_adminnumber.setEnabled(True)
+            self.REGIST_storeName.setEnabled(True)
         else:
-            self.REGIST_adminnumber.setEnabled(False)
+            self.REGIST_storeName.setEnabled(False)
 
     def exestart(self):
         self.show()
