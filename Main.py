@@ -73,6 +73,7 @@ class MainPage(QWidget, MainUIset):
 
     def move_to_bill_of_material(self):
         self.MAIN_STACK.setCurrentIndex(2)
+        self.bom_new_menu.clicked.connect(self.Move_test)
         self.bom_go_back.clicked.connect(self.bom_to_main)
 
     def bom_to_main(self):

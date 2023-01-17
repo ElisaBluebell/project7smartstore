@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="page">
     <widget class="QLabel" name="MAIN_LB_loginfo">
@@ -135,7 +135,7 @@
      </column>
      <column>
       <property name="text">
-       <string>량</string>
+       <string>수량</string>
       </property>
      </column>
      <column>
