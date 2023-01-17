@@ -357,7 +357,7 @@
       <number>0</number>
      </property>
      <property name="placeholderText">
-      <string>번호</string>
+      <string>번호 (숫자로만 입력해주세요)</string>
      </property>
     </widget>
     <widget class="QPushButton" name="REGIST_BT_cancel">
@@ -431,7 +431,7 @@
       <bool>true</bool>
      </property>
     </widget>
-    <widget class="QLineEdit" name="REGIST_adminnumber">
+    <widget class="QLineEdit" name="REGIST_storeName">
      <property name="enabled">
       <bool>false</bool>
      </property>
@@ -504,7 +504,7 @@
   <tabstop>REGIST_BT_cancel</tabstop>
   <tabstop>REGIST_radio2</tabstop>
   <tabstop>REGIST_radio</tabstop>
-  <tabstop>REGIST_adminnumber</tabstop>
+  <tabstop>REGIST_storeName</tabstop>
  </tabstops>
  <resources/>
  <connections/>

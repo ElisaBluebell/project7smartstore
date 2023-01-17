@@ -22,13 +22,42 @@ class MainPage(QWidget, MainUIset):
         self.MAIN_BT_seller_insert.clicked.connect(self.Move_test)
         self.MAIN_BT_plus.clicked.connect(self.rowplus)
         self.MAIN_listcheck.clicked.connect(self.datacheck)
+        self.MAIN_BT_buyer_buy.clicked.connect(self.Move_SellList)
+
+        self.MAIN_sellList.doubleClicked.connect(lambda: self.check_SellList(0))
+        self.le_sellnum.textChanged.connect(lambda: self.check_SellList(1))
 
 
+    def check_SellList(self, signal):
+        if signal == 0:
+            self.frame.show()
+            self.lb_productname2.setText(self.MAIN_sellList.item(self.MAIN_sellList.currentRow(), 0).text())
+            self.lb_storeName2.setText(self.MAIN_sellList.item(self.MAIN_sellList.currentRow(), 1).text())
+            self.lb_price2.setText(self.MAIN_sellList.item(self.MAIN_sellList.currentRow(), 2).text())
+        elif signal == 1:
+            try:
+                self.lb_totalPrice2.show()
+                self.lb_totalPrice.setText(f"{int(self.le_sellnum.text())*int(self.lb_price2.text())}")
+            except:
+                self.lb_totalPrice.setText(" ")
+                self.lb_totalPrice2.hide()
 
-
-
-
-
+    def Move_SellList(self):
+        self.MAIN_STACK.setCurrentIndex(3)
+        #판매리스트 세팅
+        db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
+        cursor = db.cursor()
+        num = cursor.execute("SELECT * FROM project7smartstore.user_info inner JOIN project7smartstore.product_info "
+                             "on project7smartstore.product_info.store_name = project7smartstore.user_info.store_name")
+        sellList = cursor.fetchall()
+        print(sellList)
+        self.MAIN_sellList.setRowCount(num)
+        self.MAIN_sellList.setColumnCount(4)
+        for i in range(num):
+            self.MAIN_sellList.setItem(i, 0, QTableWidgetItem(str(sellList[i][8])))
+            self.MAIN_sellList.setItem(i, 1, QTableWidgetItem(str(sellList[i][9])))
+            self.MAIN_sellList.setItem(i, 2, QTableWidgetItem(str(sellList[i][10])))
+        self.frame.hide()
 
     def BT_setting(self):
         if self.LOGIN_signal == False:
@@ -82,6 +111,7 @@ class MainPage(QWidget, MainUIset):
     # 동적 행 추가
     def rowplus(self):
         self.combobox = QComboBox()
+        self.combobox.addItem('g')
         self.combobox.addItem('mg')
         self.combobox.addItem('ml')
         self.combobox.addItem('개')
@@ -92,6 +122,7 @@ class MainPage(QWidget, MainUIset):
     def move_to_bill_of_material(self):
         self.MAIN_STACK.setCurrentIndex(2)
         self.bom_go_back.clicked.connect(self.bom_to_main)
+
     def datacheck(self):
         for i in range(self.MAIN_strorelist.rowCount()):
             for j in range(self.MAIN_strorelist.columnCount()-1):
@@ -102,7 +133,6 @@ class MainPage(QWidget, MainUIset):
                 except:
                     msg = QMessageBox.information(self, "알림", "정보를 입력해주세요")
                     return
-
 
         db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
         cursor = db.cursor()
