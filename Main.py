@@ -122,12 +122,14 @@ class MainPage(QWidget, MainUIset):
                                db='project7smartstore')
         c = conn.cursor()
 
+        # material_name에 따라 product_name을 묶어주기 위한 view 생성
         c.execute('''CREATE OR REPLACE VIEW product_group 
         AS SELECT any_value(material_idx) AS material_idx, 
         group_concat(product_name) AS product_name 
         FROM bill_of_material 
         GROUP BY material_name;''')
 
+        # 재료의 수량과 단위를 하나의 값으로 묶고 view, material_name 값을 함께 갖는 데이터 추출
         c.execute('''SELECT DISTINCT b.material_name, 
         (SELECT CONCAT(cast(b.inventory_quantity AS CHAR), a.measure_unit)) AS material_quantity, 
         c.product_name 
@@ -154,6 +156,7 @@ class MainPage(QWidget, MainUIset):
             bom_table_row = 0
             self.bom_ingredient_table.setRowCount(bom_table_row)
             for i in range(len(self.table_data)):
+                # self.table_data = [material_name, material_quantity+measure_unit, product_name GROUP BY material_name]
                 if self.bom_select_menu.currentText() in self.table_data[i][2]:
                     bom_table_row += 1
                     self.bom_ingredient_table.setRowCount(bom_table_row)
