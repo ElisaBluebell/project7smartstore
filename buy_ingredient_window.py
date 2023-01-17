@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QComboBox
 class BuyIngredient(QWidget):
     def __init__(self):
         super().__init__()
+        # self.i = 0
         self.ingredient_list = ''
 
         self.title = QLabel(self)
@@ -15,6 +16,8 @@ class BuyIngredient(QWidget):
         self.have_quantity = QLabel(self)
         self.buy_quantity = QLabel(self)
         self.measurement = QLabel(self)
+        self.price_per_unit = QLabel(self)
+        self.total_price = QLabel(self)
 
         self.esc = QPushButton(self)
 
@@ -33,6 +36,8 @@ class BuyIngredient(QWidget):
         self.have.setGeometry(20, 90, 40, 16)
 
         self.have_quantity.setGeometry(70, 90, 70, 16)
+        self.price_per_unit.setGeometry(20, 130, 90, 16)
+        self.total_price.setGeometry(160, 130, 90, 16)
 
         self.buy_quantity.setText('구매량')
         self.buy_quantity.setGeometry(160, 90, 40, 16)
@@ -100,3 +105,13 @@ class BuyIngredient(QWidget):
         while (self.ingredient_list[i][1] * j) + self.ingredient_list[i][3] < self.ingredient_list[i][1] * 10:
             j += 1
             self.select_quantity.addItem(str(j * self.ingredient_list[i][3])+self.ingredient_list[i][4])
+        self.price_per_unit.setText(f'단가: {str(self.ingredient_list[i][2])}원')
+        self.select_quantity.currentTextChanged.connect(self.calculate_total_price)
+        self.calculate_total_price()
+
+    def calculate_total_price(self):
+        print(self.select_quantity.currentText())
+        print(self.price_per_unit.text()[4:-1])
+        if len(self.select_quantity.currentText()) != 0:
+            self.total_price.setText(f'''합계: {int(self.select_quantity.currentText()[:1]) * 
+                                          (int(self.price_per_unit.text()[4:-1]))}원''')
