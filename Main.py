@@ -27,15 +27,42 @@ class MainPage(QWidget, MainUIset):
         self.MAIN_BT_minus.clicked.connect(lambda: self.rowplus(0))
         self.MAIN_listcheck.clicked.connect(self.datacheck)
         self.MAIN_BT_buyer_buy.clicked.connect(self.Move_SellList)
-
+        self.MAIN_BT_buyer_orderlist.clicked.connect(self.Move_buylist)
         self.MAIN_sellList.doubleClicked.connect(lambda: self.check_selllist(0))
         self.le_sellnum.textChanged.connect(lambda: self.check_selllist(1))
         self.BT_toMain.clicked.connect(self.move_main)
         self.BT_toMain2.clicked.connect(self.move_main)
+        self.BT_toMain3.clicked.connect(self.move_main)
         self.BT_toBuy.clicked.connect(self.Check_order)
 
         self.MAIN_BT_seller_order.clicked.connect(self.move_to_bill_of_material)
         self.ingredient_window = BuyIngredient()
+
+
+
+    def Move_buylist(self):
+        self.MAIN_STACK.setCurrentIndex(4)
+        db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
+        cursor = db.cursor()
+        a = cursor.execute("SELECT * "
+                           "FROM project7smartstore.order_management INNER JOIN project7smartstore.product_info "
+                           "ON project7smartstore.order_management.product_idx = project7smartstore.product_info.product_idx "
+                           f"WHERE project7smartstore.order_management.customer_idx = '{self.UserInfo[0]}'")
+        print(a)
+        if a == 0 :
+            return
+        buylist = cursor.fetchall()
+        print("[",buylist)
+        self.MAIN_buylist.setRowCount(a)
+        self.MAIN_buylist.setColumnCount(4)
+        for i in range(a):
+            self.MAIN_buylist.setItem(i, 0, QTableWidgetItem(str(buylist[i][3])))
+            self.MAIN_buylist.setItem(i, 1, QTableWidgetItem(str(buylist[i][4])))
+            self.MAIN_buylist.setItem(i, 2, QTableWidgetItem(str(buylist[i][11])))
+            self.MAIN_buylist.setItem(i, 3, QTableWidgetItem(str(buylist[i][6])))
+
+
+
 
     def Check_order(self):
         try:
