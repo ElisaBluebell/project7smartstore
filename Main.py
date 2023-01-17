@@ -146,7 +146,7 @@ class MainPage(QWidget, MainUIset):
         self.bom_ingredient_table.setRowCount(len(self.table_data))
         for i in range(len(self.table_data)):
             for j in range(len(self.table_data[i])):
-                self.set_bom_table_data_tooltip(i, j)
+                self.set_bom_table_data_tooltip(i, j, i, j)
 
     def set_bom_table_logic(self):
         if self.bom_select_menu.currentText() == '전체':
@@ -162,12 +162,12 @@ class MainPage(QWidget, MainUIset):
                     bom_table_column = 0
                     self.bom_ingredient_table.setRowCount(bom_table_row)
                     for j in range(len(self.table_data[i])):
-                        self.set_bom_table_data_tooltip(bom_table_row - 1, bom_table_column)
+                        self.set_bom_table_data_tooltip(bom_table_row - 1, bom_table_column, i, j)
                         bom_table_column += 1
 
-    def set_bom_table_data_tooltip(self, row, column):
-        self.bom_ingredient_table.setItem(row, column, QTableWidgetItem(self.table_data[row][column]))
-        self.bom_ingredient_table.item(row, column).setToolTip(self.table_data[row][column])
+    def set_bom_table_data_tooltip(self, row, column, i, j):
+        self.bom_ingredient_table.setItem(row, column, QTableWidgetItem(self.table_data[i][j]))
+        self.bom_ingredient_table.item(row, column).setToolTip(self.table_data[i][j])
 
     def bom_to_main(self):
         self.MAIN_STACK.setCurrentIndex(0)
