@@ -333,6 +333,21 @@
        <family>D2Coding</family>
       </font>
      </property>
+     <column>
+      <property name="text">
+       <string>재료명</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>수량</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>요리</string>
+      </property>
+     </column>
     </widget>
    </widget>
   </widget>

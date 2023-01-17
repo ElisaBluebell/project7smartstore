@@ -102,8 +102,9 @@ class MainPage(QWidget, MainUIset):
             self.bom_select_menu.addItem(item)
 
     def set_bom_table(self):
-        self.bom_ingredient_table.clear()
-        # self.
+        self.bom_ingredient_table.setColumnWidth(0, 80)
+        self.bom_ingredient_table.setColumnWidth(1, 69)
+        self.bom_ingredient_table.setColumnWidth(2, 240)
 
     def bom_to_main(self):
         self.MAIN_STACK.setCurrentIndex(0)
