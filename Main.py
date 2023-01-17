@@ -238,9 +238,9 @@ class MainPage(QWidget, MainUIset):
 
     def move_to_bill_of_material(self):
         self.set_material_db()
+        self.bom_store_name.setText(self.UserInfo[5])
 
         self.bom_go_back.clicked.connect(self.bom_to_main)
-
         self.buy_ingredient.clicked.connect(self.buy_ingredient_window)
 
         self.define_bom_combo_item()
