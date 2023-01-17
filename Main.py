@@ -18,6 +18,8 @@ class MainPage(QWidget, MainUIset):
         self.LOGIN_signal = False
         self.BT_setting()
         self.UserInfo = []
+        self.material_db = ''
+        self.table_data = []
         self.MAIN_BT_loginout.clicked.connect(self.Move_LoginPage)
         self.MAIN_BT_seller_insert.clicked.connect(self.Move_test)
         self.MAIN_BT_plus.clicked.connect(lambda: self.rowplus(1))
@@ -154,6 +156,8 @@ class MainPage(QWidget, MainUIset):
                 return
             self.MAIN_strorelist.removeRow(self.MAIN_strorelist.rowCount()-1)
 
+    def move_to_bill_of_material(self):
+        self.set_material_db()
 
     def datacheck(self):
         for i in range(self.MAIN_strorelist.rowCount()):
@@ -213,12 +217,75 @@ class MainPage(QWidget, MainUIset):
                                    f"'{self.MAIN_strorelist.item(i, 1).text()}',"
                                    f"'{self.MAIN_strorelist.cellWidget(i, 2).currentText()}',"
                                    f"'{temp2[0][0]}','{temp2[0][1]}')")
-
+                    
         except AttributeError:
             msg = QMessageBox.information(self, "알림", "잘못된 정보입니다. 확인해주세요.")
             return
         db.commit()
         db.close()
+
+    def set_bom_table(self):
+        self.bom_ingredient_table.verticalHeader().setVisible(False)
+        self.bom_ingredient_table.setColumnWidth(0, 72)
+        self.bom_ingredient_table.setColumnWidth(1, 60)
+        self.bom_ingredient_table.setColumnWidth(2, 240)
+
+        self.get_bom_table_db()
+
+        self.bom_select_menu.currentTextChanged.connect(self.set_bom_table_logic)
+
+    def get_bom_table_db(self):
+
+        conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
+                               db='project7smartstore')
+        c = conn.cursor()
+
+        # material_name에 따라 product_name을 묶어주기 위한 view 생성
+        c.execute('''CREATE OR REPLACE VIEW product_group 
+        AS SELECT any_value(material_idx) AS material_idx, 
+        group_concat(product_name) AS product_name 
+        FROM bill_of_material 
+        GROUP BY material_name;''')
+
+        # 재료의 수량과 단위를 하나의 값으로 묶고 view, material_name 값을 함께 갖는 데이터 추출
+        c.execute('''SELECT DISTINCT b.material_name, 
+        (SELECT CONCAT(cast(b.inventory_quantity AS CHAR), a.measure_unit)) AS material_quantity, 
+        c.product_name 
+        FROM bill_of_material AS a 
+        LEFT JOIN material_management AS b 
+        ON b.material_name=a.material_name 
+        INNER JOIN product_group AS c 
+        ON c.material_idx=a.material_idx;''')
+
+        self.table_data = c.fetchall()
+        self.bom_table_default_data()
+
+    def bom_table_default_data(self):
+        self.bom_ingredient_table.setRowCount(len(self.table_data))
+        for i in range(len(self.table_data)):
+            for j in range(len(self.table_data[i])):
+                self.set_bom_table_data_tooltip(i, j, i, j)
+
+    def set_bom_table_logic(self):
+        if self.bom_select_menu.currentText() == '전체':
+            self.bom_table_default_data()
+
+        else:
+            bom_table_row = 0
+            self.bom_ingredient_table.setRowCount(bom_table_row)
+            for i in range(len(self.table_data)):
+                # self.table_data = [material_name, material_quantity+measure_unit, product_name GROUP BY material_name]
+                if self.bom_select_menu.currentText() in self.table_data[i][2]:
+                    bom_table_row += 1
+                    bom_table_column = 0
+                    self.bom_ingredient_table.setRowCount(bom_table_row)
+                    for j in range(len(self.table_data[i])):
+                        self.set_bom_table_data_tooltip(bom_table_row - 1, bom_table_column, i, j)
+                        bom_table_column += 1
+
+    def set_bom_table_data_tooltip(self, row, column, i, j):
+        self.bom_ingredient_table.setItem(row, column, QTableWidgetItem(self.table_data[i][j]))
+        self.bom_ingredient_table.item(row, column).setToolTip(self.table_data[i][j])
 
     def bom_to_main(self):
         self.MAIN_STACK.setCurrentIndex(0)
