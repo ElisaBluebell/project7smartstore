@@ -5,6 +5,7 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import *
 
 from Login import LoginPage
+from buy_ingredient_window import BuyIngredient
 
 MainUIset = uic.loadUiType("ui/main.ui")[0]
 
@@ -32,6 +33,9 @@ class MainPage(QWidget, MainUIset):
         self.BT_toMain.clicked.connect(self.move_main)
         self.BT_toMain2.clicked.connect(self.move_main)
         self.BT_toBuy.clicked.connect(self.Check_order)
+
+        self.MAIN_BT_seller_order.clicked.connect(self.move_to_bill_of_material)
+        self.ingredient_window = BuyIngredient()
 
     def Check_order(self):
         try:
@@ -156,9 +160,6 @@ class MainPage(QWidget, MainUIset):
                 return
             self.MAIN_strorelist.removeRow(self.MAIN_strorelist.rowCount()-1)
 
-    def move_to_bill_of_material(self):
-        self.set_material_db()
-
     def datacheck(self):
         for i in range(self.MAIN_strorelist.rowCount()):
             for j in range(self.MAIN_strorelist.columnCount() - 1):
@@ -224,6 +225,40 @@ class MainPage(QWidget, MainUIset):
         db.commit()
         db.close()
 
+    def set_material_db(self):
+        conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
+                               db='project7smartstore')
+        c = conn.cursor()
+
+        c. execute('SELECT * FROM `project7smartstore`.`bill_of_material`')
+        self.material_db = c.fetchall()
+
+        c.close()
+        conn.close()
+
+    def move_to_bill_of_material(self):
+        self.set_material_db()
+
+        self.bom_go_back.clicked.connect(self.bom_to_main)
+
+        self.buy_ingredient.clicked.connect(self.buy_ingredient_window)
+
+        self.define_bom_combo_item()
+        self.set_bom_table()
+
+        self.MAIN_STACK.setCurrentIndex(1)
+
+    def define_bom_combo_item(self):
+        if not self.bom_select_menu.currentText():
+            self.bom_select_menu.addItem('전체')
+            menu = []
+            for item in self.material_db:
+                if item[6] not in menu:
+                    menu.append(item[6])
+            for item in menu:
+                if item:
+                    self.bom_select_menu.addItem(item)
+
     def set_bom_table(self):
         self.bom_ingredient_table.verticalHeader().setVisible(False)
         self.bom_ingredient_table.setColumnWidth(0, 72)
@@ -287,8 +322,12 @@ class MainPage(QWidget, MainUIset):
         self.bom_ingredient_table.setItem(row, column, QTableWidgetItem(self.table_data[i][j]))
         self.bom_ingredient_table.item(row, column).setToolTip(self.table_data[i][j])
 
+    def buy_ingredient_window(self):
+        self.ingredient_window.show()
+
     def bom_to_main(self):
         self.MAIN_STACK.setCurrentIndex(0)
+
 
 
 
