@@ -280,7 +280,7 @@ class MainPage(QWidget, MainUIset):
         group_concat(product_name) AS product_name 
         FROM bill_of_material 
         GROUP BY material_name;''')
-
+        # 111
         # 재료의 수량과 단위를 하나의 값으로 묶고 view, material_name 값을 함께 갖는 데이터 추출
         c.execute('''SELECT DISTINCT b.material_name, 
         (SELECT CONCAT(cast(b.inventory_quantity AS CHAR), a.measure_unit)) AS material_quantity, 
