@@ -107,13 +107,13 @@ class MainPage(QWidget, MainUIset):
                     self.bom_select_menu.addItem(item)
 
     def set_bom_table(self):
-
         self.bom_ingredient_table.verticalHeader().setVisible(False)
         self.bom_ingredient_table.setColumnWidth(0, 72)
         self.bom_ingredient_table.setColumnWidth(1, 60)
         self.bom_ingredient_table.setColumnWidth(2, 240)
 
         self.get_bom_table_db()
+
         self.bom_select_menu.currentTextChanged.connect(self.set_bom_table_logic)
 
     def get_bom_table_db(self):
