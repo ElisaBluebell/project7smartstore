@@ -64,6 +64,7 @@ class MainPage(QWidget, MainUIset):
     def rowplus(self):
         self.combobox = QComboBox()
         self.combobox.addItem('mg')
+        self.combobox.addItem('g')
         self.combobox.addItem('ml')
         self.combobox.addItem('개')
         self.MAIN_strorelist.insertRow(self.MAIN_strorelist.rowCount())  # 동적row 추가
