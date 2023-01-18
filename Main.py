@@ -7,9 +7,8 @@ from PyQt5.QtWidgets import *
 from Login import LoginPage
 from buy_ingredient_window import Ingredient
 
+
 MainUIset = uic.loadUiType("ui/main.ui")[0]
-
-
 class MainPage(QWidget, MainUIset):
     def __init__(self):
         super().__init__()
@@ -34,7 +33,6 @@ class MainPage(QWidget, MainUIset):
         self.BT_toMain2.clicked.connect(self.move_main)
         self.BT_toMain3.clicked.connect(self.move_main)
         self.BT_toBuy.clicked.connect(self.Check_order)
-
         self.MAIN_BT_seller_order.clicked.connect(self.move_to_bill_of_material)
         self.ingredient_window = Ingredient()
 

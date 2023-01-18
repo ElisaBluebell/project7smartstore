@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>2</number>
    </property>
    <widget class="QWidget" name="page">
     <widget class="QLabel" name="MAIN_LB_loginfo">
@@ -628,6 +628,79 @@
      </widget>
     </widget>
     <widget class="QPushButton" name="BT_toMain">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>메인</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="page_5">
+    <widget class="QLabel" name="buylist_title">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>20</y>
+       <width>451</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>D2Coding</family>
+       <pointsize>18</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>주문현황</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QTableWidget" name="MAIN_buylist">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>110</y>
+       <width>430</width>
+       <height>341</height>
+      </rect>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <column>
+      <property name="text">
+       <string>제품명</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>구매갯수</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>가격</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>상호명</string>
+      </property>
+     </column>
+    </widget>
+    <widget class="QPushButton" name="BT_toMain3">
      <property name="geometry">
       <rect>
        <x>10</x>
