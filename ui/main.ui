@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="page">
     <widget class="QLabel" name="MAIN_LB_loginfo">
@@ -122,7 +122,7 @@
     <widget class="QPushButton" name="buy_ingredient">
      <property name="geometry">
       <rect>
-       <x>270</x>
+       <x>250</x>
        <y>620</y>
        <width>70</width>
        <height>23</height>
@@ -302,6 +302,19 @@
       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
     </widget>
+    <widget class="QPushButton" name="faq_management">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>620</y>
+       <width>70</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>문의 관리</string>
+     </property>
+    </widget>
    </widget>
    <widget class="QWidget" name="page_3">
     <widget class="QPushButton" name="MAIN_listcheck">
@@ -421,6 +434,21 @@
      <property name="editTriggers">
       <set>QAbstractItemView::NoEditTriggers</set>
      </property>
+     <property name="tabKeyNavigation">
+      <bool>false</bool>
+     </property>
+     <property name="showDropIndicator" stdset="0">
+      <bool>false</bool>
+     </property>
+     <property name="dragDropOverwriteMode">
+      <bool>false</bool>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::NoSelection</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
      <column>
       <property name="text">
        <string>제품명</string>
@@ -438,7 +466,7 @@
      </column>
      <column>
       <property name="text">
-       <string>판매가능갯수</string>
+       <string>구매가능갯수</string>
       </property>
      </column>
     </widget>
@@ -632,6 +660,183 @@
       <rect>
        <x>10</x>
        <y>10</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>메인</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="page_5">
+    <widget class="QLabel" name="faq_title">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>80</y>
+       <width>451</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>D2Coding</family>
+       <pointsize>18</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>문의 관리</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QTableWidget" name="faq_table">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>190</y>
+       <width>391</width>
+       <height>411</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>D2Coding</family>
+      </font>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <attribute name="horizontalHeaderCascadingSectionResizes">
+      <bool>false</bool>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>유저명</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>주문번호</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>요리</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>처리여부</string>
+      </property>
+     </column>
+    </widget>
+    <widget class="QPushButton" name="faq_go_back">
+     <property name="geometry">
+      <rect>
+       <x>350</x>
+       <y>620</y>
+       <width>70</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>나가기</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="faq_store_name">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>451</width>
+       <height>31</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>16</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="page_6">
+    <widget class="QLabel" name="bom_title_2">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>50</y>
+       <width>451</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>D2Coding</family>
+       <pointsize>18</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>주문 내역</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QTableWidget" name="MAIN_buylist">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>140</y>
+       <width>391</width>
+       <height>411</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>D2Coding</family>
+      </font>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <attribute name="horizontalHeaderCascadingSectionResizes">
+      <bool>false</bool>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>상품명</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>갯수</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>가격</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>상호명</string>
+      </property>
+     </column>
+    </widget>
+    <widget class="QPushButton" name="BT_toMain3">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>20</y>
        <width>75</width>
        <height>23</height>
       </rect>

@@ -41,7 +41,7 @@ class MainPage(QWidget, MainUIset):
 
 
     def Move_buylist(self):
-        self.MAIN_STACK.setCurrentIndex(4)
+        self.MAIN_STACK.setCurrentIndex(5)
         db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
         cursor = db.cursor()
         a = cursor.execute("SELECT * "
@@ -56,10 +56,10 @@ class MainPage(QWidget, MainUIset):
         self.MAIN_buylist.setRowCount(a)
         self.MAIN_buylist.setColumnCount(4)
         for i in range(a):
-            self.MAIN_buylist.setItem(i, 0, QTableWidgetItem(str(buylist[i][3])))
-            self.MAIN_buylist.setItem(i, 1, QTableWidgetItem(str(buylist[i][4])))
-            self.MAIN_buylist.setItem(i, 2, QTableWidgetItem(str(buylist[i][11])))
-            self.MAIN_buylist.setItem(i, 3, QTableWidgetItem(str(buylist[i][6])))
+            self.MAIN_buylist.setItem(i, 0, QTableWidgetItem(str(buylist[i][4])))
+            self.MAIN_buylist.setItem(i, 1, QTableWidgetItem(str(buylist[i][5])))
+            self.MAIN_buylist.setItem(i, 2, QTableWidgetItem(str(buylist[i][12])))
+            self.MAIN_buylist.setItem(i, 3, QTableWidgetItem(str(buylist[i][7])))
 
 
 
@@ -73,7 +73,12 @@ class MainPage(QWidget, MainUIset):
                            f"WHERE project7smartstore.product_info.store_name='{self.lb_storeName2.text()}' and "
                            f"project7smartstore.product_info.product_name='{self.lb_productname2.text()}'")
             a = cursor.fetchall()
-            print(a)
+            print("a",a)
+            cursor.execute(f'call project7smartstore.material_num_check("{self.lb_productname2.text()}")')
+            num = cursor.fetchone()[0]
+            if num < int(self.le_sellnum.text()):
+                msg = QMessageBox.information(self, "알림", "구매 수량을 확인해주세요")
+                return
             cursor.execute("INSERT INTO project7smartstore.order_management "
                            f"(product_idx,product_name,product_quantity,customer_idx,seller_idx,store_name) "
                            f"values('{a[0][7]}','{a[0][8]}','{self.le_sellnum.text()}','{self.UserInfo[0]}',"
@@ -92,6 +97,9 @@ class MainPage(QWidget, MainUIset):
 
     def check_selllist(self, signal):
         if signal == 0:
+            if self.MAIN_sellList.item(self.MAIN_sellList.currentRow(),3).text() == "구매불가":
+                msg = QMessageBox.information(self, "알림", "구매할 수 없는 상품입니다.")
+                return
             self.frame.show()
             self.le_sellnum.clear()
             self.lb_productname2.setText(self.MAIN_sellList.item(self.MAIN_sellList.currentRow(), 0).text())
@@ -121,6 +129,15 @@ class MainPage(QWidget, MainUIset):
             self.MAIN_sellList.setItem(i, 0, QTableWidgetItem(str(sellList[i][8])))
             self.MAIN_sellList.setItem(i, 1, QTableWidgetItem(str(sellList[i][9])))
             self.MAIN_sellList.setItem(i, 2, QTableWidgetItem(str(sellList[i][10])))
+            conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
+                                   db='project7smartstore')
+            c = conn.cursor()
+            #재고확인해서 만들 수 있는 갯수 체크
+            c.execute(f'call material_num_check("{str(sellList[i][8])}")')
+            sellnum = c.fetchall()[0][0]
+            if sellnum == 0 or sellnum == None:
+                sellnum = '구매불가'
+            self.MAIN_sellList.setItem(i, 3, QTableWidgetItem(str(sellnum)))
         self.frame.hide()
 
     def BT_setting(self):
@@ -380,11 +397,81 @@ class MainPage(QWidget, MainUIset):
                 self.bom_available.setText(f'{str(producible)}개 제작 가능')
 
     def buy_ingredient_window(self):
+        self.ingredient_window.reset_items()
         self.ingredient_window.show()
 
     def bom_to_main(self):
         self.MAIN_STACK.setCurrentIndex(0)
 
+    def move_to_faq(self):
+        self.set_faq_page()
+        self.MAIN_STACK.setCurrentIndex(4)
+
+    def set_faq_page(self):
+        self.set_faq_table()
+        self.set_faq_btn()
+        self.set_faq_label()
+
+    def set_faq_table(self):
+        faq_data = self.get_faq_data()
+        store_faq_data = self.check_store_match_faq(faq_data)
+        self.set_faq_table_rowcount(store_faq_data)
+        self.faq_data_putin_table(store_faq_data)
+        self.faq_table.clicked.connect(self.faq_detail)
+
+    def set_faq_btn(self):
+        self.faq_go_back.clicked.connect(self.faq_to_bom)
+
+    def set_faq_label(self):
+        self.faq_store_name.setText(f'{self.UserInfo[5]}')
+
+    @staticmethod
+    def get_faq_data():
+        conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
+                               db='project7smartstore')
+        c = conn.cursor()
+
+        c.execute('SELECT * FROM faq_management')
+        faq_data = c.fetchall()
+
+        c.close()
+        conn.close()
+
+        return faq_data
+
+    def check_store_match_faq(self, faq_data):
+        store_faq = []
+        for i in range(len(faq_data)):
+            if self.UserInfo[0] == faq_data[i][1]:
+                store_faq.append(faq_data[i])
+
+        return store_faq
+
+    def set_faq_table_rowcount(self, store_faq_data):
+        self.faq_table.setRowCount(len(store_faq_data))
+
+    def faq_data_putin_table(self, store_faq_data):
+        for i in range(len(store_faq_data)):
+            self.faq_table.setItem(i, 0, QTableWidgetItem(store_faq_data[i][4]))
+            self.faq_table.setItem(i, 1, QTableWidgetItem(str(store_faq_data[i][7])))
+            self.faq_table.setItem(i, 2, QTableWidgetItem(store_faq_data[i][6]))
+            self.faq_table.setItem(i, 3, QTableWidgetItem(self.faq_process_int_to_str(store_faq_data[i][9])))
+
+    @staticmethod
+    def faq_process_int_to_str(faq_process):
+        if faq_process == 0:
+            faq_process_text = '접수'
+
+        else:
+            faq_process_text = '완료'
+
+        return faq_process_text
+
+    def faq_detail(self):
+        table_row = self.faq_table.currentRow()
+
+    def faq_to_bom(self):
+        self.MAIN_STACK.setCurrentIndex(1)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
