@@ -99,7 +99,8 @@ class BuyIngredient(QWidget):
         self.select_ingredient.clear()
         # 받아온 DB의 길이만큼 재료명 추가
         for ingredient in self.ingredient_list:
-            self.select_ingredient.addItem(ingredient[0])
+            if ingredient[1] != 0:
+                self.select_ingredient.addItem(ingredient[0])
 
         self.set_select_quantity()
         self.select_ingredient.currentTextChanged.connect(self.set_select_quantity)
