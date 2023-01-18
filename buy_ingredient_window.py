@@ -10,9 +10,12 @@ class Ingredient(QTabWidget):
         super().__init__()
         buy_ingredient = BuyIngredient()
         manage_ingredient = ManageIngredient()
+
         self.addTab(buy_ingredient, '재료 구매')
         self.addTab(manage_ingredient, '재료 관리')
         self.set_ui()
+
+        manage_ingredient.reset_select_name_item()
 
     def set_ui(self):
         self.setFont(QtGui.QFont('D2Coding'))
@@ -181,6 +184,7 @@ class ManageIngredient(QWidget):
         self.select_measurement = QComboBox(self)
 
         self.set_page()
+        self.buy_ingredient = BuyIngredient()
 
     def set_page(self):
         self.set_ui()
@@ -191,6 +195,8 @@ class ManageIngredient(QWidget):
         self.set_connect()
         self.set_combo_item()
         self.set_etc()
+
+        self.set_select_name_item()
 
     def set_logic(self):
         pass
@@ -235,19 +241,21 @@ class ManageIngredient(QWidget):
         self.set_select_measurement_item()
 
     def set_select_name_item(self):
+        self.select_name.clear()
         sql = f'''SELECT material_name, buy_unit FROM material_management'''
         name_unit = self.exe_db_smartstore(sql)
         new_item = ''
+
         for item in name_unit:
             if item[1] == 0:
                 # 툴팁으로 등록하기 위해 텍스트 더함
                 new_item += f'{item[0]} '
                 # 등록 필요한 신규 아이템 구별을 위한 *표
                 self.select_name.addItem(f'{item[0]}*')
+
             else:
                 self.select_name.addItem(f'{item[0]}')
         self.select_name.setToolTip(f'{new_item}등록 필요')
-
 
     def set_select_bundle_item(self):
         for i in range(1, 5):
@@ -259,28 +267,40 @@ class ManageIngredient(QWidget):
             self.select_measurement.addItem(measurement[i])
 
     def modify_ingredient(self):
-        name = self.check_new_name()
+        try:
+            if type(int(self.input_price.text())) == int:
+                name = self.check_new_name()
 
-        sql = f'''UPDATE material_management SET  
-        material_price={int(self.input_price.text())}, 
-        buy_unit={self.select_bundle.currentData()}
-        WHERE material_name="{name}"'''
-        self.exe_db_smartstore(sql)
+                sql = f'''UPDATE material_management SET  
+                material_price={int(self.input_price.text())}, 
+                buy_unit={self.select_bundle.currentData()}
+                WHERE material_name="{name}"'''
+                self.exe_db_smartstore(sql)
 
-        sql = f'''UPDATE bill_of_material SET
-        measure_unit="{self.select_measurement.currentText()}"
-        WHERE material_name="{name}"'''
-        self.exe_db_smartstore(sql)
-        
-        QMessageBox.information(self, '수정', '수정되었습니다.')
+                sql = f'''UPDATE bill_of_material SET
+                measure_unit="{self.select_measurement.currentText()}"
+                WHERE material_name="{name}"'''
+                self.exe_db_smartstore(sql)
+
+                QMessageBox.information(self, '수정', '수정되었습니다.')
+                self.reset_select_name_item()
+
+        except:
+            pass
 
     def delete_ingredient(self):
-        sql = f'''DELETE FROM material_management WHERE material_name="{self.select_name.currentText()}"'''
+        name = self.check_new_name()
+
+        sql = f'''DELETE FROM material_management 
+        WHERE material_name="{name}"'''
         self.exe_db_smartstore(sql)
-        sql = f'''DELETE FROM bill_of_material WHERE material_name="{self.select_name.currentText()}"'''
+
+        sql = f'''DELETE FROM bill_of_material 
+        WHERE material_name="{name}"'''
         self.exe_db_smartstore(sql)
 
         QMessageBox.information(self, '삭제', '삭제되었습니다.')
+        self.reset_select_name_item()
 
     def check_new_name(self):
         if '*' in self.select_name.currentText():
@@ -288,6 +308,10 @@ class ManageIngredient(QWidget):
         else:
             name = self.select_name.currentText()
         return name
+
+    def reset_select_name_item(self):
+        self.select_name.clear()
+        self.set_select_name_item()
 
     @staticmethod
     def exe_db_smartstore(sql):
