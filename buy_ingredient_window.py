@@ -2,7 +2,7 @@ import pymysql
 
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QComboBox, QMessageBox, QTabWidget
+from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QComboBox, QMessageBox, QTabWidget, QLineEdit
 
 
 class Ingredient(QTabWidget):
@@ -41,7 +41,7 @@ class BuyIngredient(QWidget):
         self.set_ui()
 
     def set_label(self):
-        self.title.setText('재료구매')
+        self.title.setText('재료 구매')
         self.title.setGeometry(0, 10, 315, 30)
         self.title.setFont(QtGui.QFont('D2Coding', 14))
         self.title.setAlignment(Qt.AlignCenter)
@@ -164,31 +164,110 @@ class BuyIngredient(QWidget):
 class ManageIngredient(QWidget):
     def __init__(self):
         super().__init__()
-        self.set_db()
+
+        self.title = QLabel(self)
+        self.name = QLabel(self)
+        self.price = QLabel(self)
+        self.bundle = QLabel(self)
+        self.measurement = QLabel(self)
+
+        self.input_price = QLineEdit(self)
+
+        self.modify = QPushButton(self)
+        self.delete = QPushButton(self)
+
+        self.select_name = QComboBox(self)
+        self.select_bundle = QComboBox(self)
+        self.select_measurement = QComboBox(self)
+
+        self.set_page()
+
+    def set_page(self):
         self.set_ui()
-
-    def set_label(self):
-        pass
-
-    def set_line(self):
-        pass
-
-    def set_btn(self):
-        pass
-
-    def set_combo(self):
-        pass
+        self.set_logic()
 
     def set_ui(self):
-        self.set_label()
-        self.set_line()
-        self.set_btn()
-        self.set_combo()
+        self.set_text()
+        self.set_geometry()
+        self.set_connect()
+        self.set_combo_item()
+        self.set_etc()
 
-    def set_db(self):
+    def set_logic(self):
         pass
 
+    def set_text(self):
+        self.title.setText('재료 관리')
+        self.name.setText('이름')
+        self.price.setText('가격')
+        self.bundle.setText('수량')
+        self.measurement.setText('단위')
 
+        self.delete.setText('삭제')
+        self.modify.setText('수정')
 
+    def set_geometry(self):
+        self.title.setGeometry(0, 10, 315, 30)
+        self.name.setGeometry(20, 50, 40, 20)
+        self.price.setGeometry(20, 90, 40, 20)
+        self.bundle.setGeometry(160, 50, 40, 20)
+        self.measurement.setGeometry(160, 90, 40, 20)
 
+        self.input_price.setGeometry(60, 90, 80, 20)
 
+        self.delete.setGeometry(20, 130, 75, 23)
+        self.modify.setGeometry(220, 130, 75, 23)
+
+        self.select_name.setGeometry(60, 50, 80, 20)
+        self.select_bundle.setGeometry(200, 50, 95, 20)
+        self.select_measurement.setGeometry(200, 90, 95, 20)
+
+    def set_connect(self):
+        self.delete.clicked.connect(self.delete_ingredient)
+        self.modify.clicked.connect(self.modify_ingredient)
+
+    def set_etc(self):
+        self.title.setFont(QtGui.QFont('D2Coding', 14))
+        self.title.setAlignment(Qt.AlignCenter)
+
+    def set_combo_item(self):
+        self.set_select_name_item()
+        self.set_select_bundle_item()
+        self.set_select_measurement_item()
+
+    def set_select_name_item(self):
+        pass
+
+    def set_select_bundle_item(self):
+        for i in range(1, 5):
+            self.select_bundle.addItem(str(1) + i * str(0), int(str(1) + i * str(0)))
+
+    def set_select_measurement_item(self):
+        measurement = ['개', 'g', 'ml']
+        for i in range(len(measurement)):
+            self.select_measurement.addItem(measurement[i])
+
+    def modify_ingredient(self):
+        sql = f'''UPDATE material_management SET 
+        buy_unit={self.select_bundle.currentData()}, 
+        material_price={int(self.input_price.text())} 
+        WHERE material_name={self.select_name.currentText()}'''
+        self.exe_db_smartstore(sql)
+
+    def delete_ingredient(self):
+        sql = f'''DELETE FROM material_management WHERE material_name={self.select_name.currentText()}'''
+        self.exe_db_smartstore(sql)
+
+    @staticmethod
+    def exe_db_smartstore(sql):
+        conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
+                                    db='project7smartstore')
+        c = conn.cursor()
+
+        c.execute(sql)
+        loaded = c.fetchall()
+
+        c.close()
+        conn.close()
+
+        return loaded
