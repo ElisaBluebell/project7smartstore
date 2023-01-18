@@ -95,8 +95,10 @@ class BuyIngredient(QWidget):
 
     def set_select_ingredient(self):
         self.select_ingredient.clear()
+        # 받아온 DB의 길이만큼 재료명 추가
         for ingredient in self.ingredient_list:
             self.select_ingredient.addItem(ingredient[0])
+
         self.set_select_quantity()
         self.select_ingredient.currentTextChanged.connect(self.set_select_quantity)
 
@@ -139,6 +141,7 @@ class BuyIngredient(QWidget):
                                    db='project7smartstore')
             c = conn.cursor()
 
+            # 재고 수량 = 재고 수량 + (구매 단위 * 선택 수량 맨 앞자리수)
             c.execute(f'''UPDATE material_management 
             SET inventory_quantity=inventory_quantity+(buy_unit*{int(self.select_quantity.currentText()[:1])}) 
             WHERE material_name="{self.select_ingredient.currentText()}"''')
