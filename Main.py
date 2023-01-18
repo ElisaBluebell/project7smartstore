@@ -35,6 +35,7 @@ class MainPage(QWidget, MainUIset):
         self.BT_toBuy.clicked.connect(self.Check_order)
 
         self.MAIN_BT_seller_order.clicked.connect(self.move_to_bill_of_material)
+        self.faq_management.clicked.connect(self.move_to_faq)
         self.ingredient_window = Ingredient()
 
     def Check_order(self):
@@ -354,11 +355,71 @@ class MainPage(QWidget, MainUIset):
                 self.bom_available.setText(f'{str(producible)}개 제작 가능')
 
     def buy_ingredient_window(self):
+        self.ingredient_window.reset_items()
         self.ingredient_window.show()
 
     def bom_to_main(self):
         self.MAIN_STACK.setCurrentIndex(0)
 
+    def move_to_faq(self):
+        self.set_faq_page()
+        self.MAIN_STACK.setCurrentIndex(4)
+
+    def set_faq_page(self):
+        self.set_faq_table()
+        self.set_faq_btn()
+        self.set_faq_label()
+
+    def set_faq_table(self):
+        faq_data = self.get_faq_data()
+        store_faq_data = self.check_store_match_faq(faq_data)
+        self.set_faq_table_rowcount(store_faq_data)
+        self.faq_data_putin_table(store_faq_data)
+
+    def set_faq_btn(self):
+        self.faq_go_back.clicked.connect(self.faq_to_bom)
+
+    def set_faq_label(self):
+        self.faq_store_name.setText(f'{self.UserInfo[5]}')
+
+    def faq_to_bom(self):
+        self.MAIN_STACK.setCurrentIndex(1)
+
+    def get_faq_data(self):
+        conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
+                               db='project7smartstore')
+        c = conn.cursor()
+
+        c.execute('SELECT * FROM faq_management')
+        faq_data = c.fetchall()
+
+        c.close()
+        conn.close()
+
+        return faq_data
+
+    def check_store_match_faq(self, faq_data):
+        for i in range(len(faq_data)):
+            store_faq = []
+
+            if self.UserInfo[0] == faq_data[i][1]:
+                store_faq.append(faq_data[i])
+
+        return store_faq
+
+    def set_faq_table_rowcount(self, store_faq_data):
+        self.faq_table.setRowCount(len(store_faq_data))
+
+    def faq_data_putin_table(self, store_faq_data):
+        for i in range(len(store_faq_data)):
+            self.faq_table.setItem(i, 0, QTableWidgetItem(store_faq_data[i][4]))
+            self.faq_table.setItem(i, 1, QTableWidgetItem(str(store_faq_data[i][7])))
+            self.faq_table.setItem(i, 2, QTableWidgetItem(store_faq_data[i][6]))
+            self.faq_table.setItem(i, 3, QTableWidgetItem(store_faq_data[i][9]))
+
+    def faq_process_int_to_str(self, faq_process):
+        if faq_process == 0:
+            faq_process_text
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

@@ -8,19 +8,20 @@ from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QComboBox, QMessageBox
 class Ingredient(QTabWidget):
     def __init__(self):
         super().__init__()
-        buy_ingredient = BuyIngredient()
-        manage_ingredient = ManageIngredient()
+        self.buy_ingredient = BuyIngredient()
+        self.manage_ingredient = ManageIngredient()
 
-        self.addTab(buy_ingredient, '재료 구매')
-        self.addTab(manage_ingredient, '재료 관리')
+        self.addTab(self.buy_ingredient, '재료 구매')
+        self.addTab(self.manage_ingredient, '재료 관리')
         self.set_ui()
-
-        manage_ingredient.reset_select_name_item()
 
     def set_ui(self):
         self.setFont(QtGui.QFont('D2Coding'))
         self.setGeometry(420, 200, 315, 200)
 
+    def reset_items(self):
+        self.buy_ingredient.set_db()
+        self.manage_ingredient.reset_select_name_item()
 
 class BuyIngredient(QWidget):
     def __init__(self):
@@ -121,7 +122,7 @@ class BuyIngredient(QWidget):
         while (self.ingredient_list[i][1] * j) + self.ingredient_list[i][3] <= self.ingredient_list[i][1] * 9:
             j += 1
             # 앞자리 수*구매단위(1*1000=1000, 8*10=80) 등으로 구매 단위에 맞춰 구매수량 추가
-            self.select_quantity.addItem(str(j * self.ingredient_list[i][1])+self.ingredient_list[i][4])
+            self.select_quantity.addItem(str(j * self.ingredient_list[i][1]) + self.ingredient_list[i][4])
 
         # 해당 재료에 맞춰 라벨값 반응
         self.set_responsive_label_text(i)
@@ -138,8 +139,8 @@ class BuyIngredient(QWidget):
         # 수량이 빈 값이 아닌 경우(초기화로 인해 비는 경우를 제외)
         if len(self.select_quantity.currentText()) != 0:
             # 선택한 수량의 맨 앞자리 수(set_select_quantity 함수의 j값) * 단가
-            self.total_price.setText(f'''합계: {int(self.select_quantity.currentText()[:1]) * 
-                                          (int(self.price_per_unit.text()[4:-1]))}원''')
+            self.total_price.setText(f'''합계: {int(self.select_quantity.currentText()[:1]) *
+                                              (int(self.price_per_unit.text()[4:-1]))}원''')
 
     def purchase_ingredient(self):
         if len(self.select_quantity.currentText()) != 0:
@@ -242,20 +243,23 @@ class ManageIngredient(QWidget):
 
     def set_select_name_item(self):
         self.select_name.clear()
+
         sql = f'''SELECT material_name, buy_unit FROM material_management'''
         name_unit = self.exe_db_smartstore(sql)
-        new_item = ''
+
+        new_item_tooltip = ''
 
         for item in name_unit:
             if item[1] == 0:
                 # 툴팁으로 등록하기 위해 텍스트 더함
-                new_item += f'{item[0]} '
+                new_item_tooltip += f'{item[0]} '
+
                 # 등록 필요한 신규 아이템 구별을 위한 *표
                 self.select_name.addItem(f'{item[0]}*')
 
             else:
                 self.select_name.addItem(f'{item[0]}')
-        self.select_name.setToolTip(f'{new_item}등록 필요')
+        self.select_name.setToolTip(f'{new_item_tooltip}등록 필요')
 
     def set_select_bundle_item(self):
         for i in range(1, 5):
@@ -316,7 +320,7 @@ class ManageIngredient(QWidget):
     @staticmethod
     def exe_db_smartstore(sql):
         conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
-                                    db='project7smartstore')
+                               db='project7smartstore')
         c = conn.cursor()
 
         c.execute(sql)
