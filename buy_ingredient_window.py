@@ -2,13 +2,27 @@ import pymysql
 
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QComboBox, QMessageBox
+from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QComboBox, QMessageBox, QTabWidget
+
+
+class Ingredient(QTabWidget):
+    def __init__(self):
+        super().__init__()
+        buy_ingredient = BuyIngredient()
+        manage_ingredient = ManageIngredient()
+        self.addTab(buy_ingredient, '재료 구매')
+        self.addTab(manage_ingredient, '재료 관리')
+        self.set_ui()
+        print(self)
+
+    def set_ui(self):
+        self.setFont(QtGui.QFont('D2Coding'))
+        self.setGeometry(420, 200, 315, 200)
 
 
 class BuyIngredient(QWidget):
     def __init__(self):
         super().__init__()
-        # self.i = 0
         self.ingredient_list = ''
 
         self.title = QLabel(self)
@@ -19,7 +33,6 @@ class BuyIngredient(QWidget):
         self.price_per_unit = QLabel(self)
         self.total_price = QLabel(self)
 
-        self.esc = QPushButton(self)
         self.purchase = QPushButton(self)
 
         self.select_ingredient = QComboBox(self)
@@ -29,7 +42,7 @@ class BuyIngredient(QWidget):
 
     def set_label(self):
         self.title.setText('재료구매')
-        self.title.setGeometry(0, 10, 220, 30)
+        self.title.setGeometry(0, 10, 315, 30)
         self.title.setFont(QtGui.QFont('D2Coding', 14))
         self.title.setAlignment(Qt.AlignCenter)
 
@@ -38,27 +51,23 @@ class BuyIngredient(QWidget):
 
         self.have_quantity.setGeometry(70, 90, 70, 16)
         self.price_per_unit.setGeometry(20, 130, 90, 16)
-        self.total_price.setGeometry(160, 130, 90, 16)
+        self.total_price.setGeometry(160, 90, 90, 16)
 
         self.buy_quantity.setText('구매량')
-        self.buy_quantity.setGeometry(160, 90, 40, 16)
+        self.buy_quantity.setGeometry(160, 50, 40, 16)
 
         self.measurement.setGeometry(290, 90, 20, 16)
 
     def set_btn(self):
-        self.esc.setText('닫기')
-        self.esc.setGeometry(230, 10, 75, 23)
-        self.esc.clicked.connect(self.esc_window)
-
         self.purchase.setText('구매')
-        self.purchase.setGeometry(230, 50, 75, 23)
+        self.purchase.setGeometry(160, 130, 75, 23)
         self.purchase.clicked.connect(self.purchase_ingredient)
 
     def set_combo(self):
         self.select_ingredient.setGeometry(20, 50, 90, 20)
         self.set_select_ingredient()
 
-        self.select_quantity.setGeometry(210, 90, 71, 22)
+        self.select_quantity.setGeometry(210, 50, 71, 22)
 
     def set_ui(self):
         self.set_db()
@@ -66,9 +75,6 @@ class BuyIngredient(QWidget):
         self.set_label()
         self.set_btn()
         self.set_combo()
-
-        self.setFont(QtGui.QFont('D2Coding'))
-        self.setGeometry(420, 200, 315, 160)
 
     def set_db(self):
         conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
@@ -89,9 +95,6 @@ class BuyIngredient(QWidget):
 
         c.close()
         conn.close()
-
-    def esc_window(self):
-        self.close()
 
     def set_select_ingredient(self):
         self.select_ingredient.clear()
@@ -156,3 +159,36 @@ class BuyIngredient(QWidget):
 
         else:
             QMessageBox.warning(self, '구매 불가', '더이상 구매할 수 없습니다.')
+
+
+class ManageIngredient(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.set_db()
+        self.set_ui()
+
+    def set_label(self):
+        pass
+
+    def set_line(self):
+        pass
+
+    def set_btn(self):
+        pass
+
+    def set_combo(self):
+        pass
+
+    def set_ui(self):
+        self.set_label()
+        self.set_line()
+        self.set_btn()
+        self.set_combo()
+
+    def set_db(self):
+        pass
+
+
+
+
+
