@@ -251,18 +251,18 @@ class MainPage(QWidget, MainUIset):
         self.MAIN_STACK.setCurrentIndex(1)
 
     def define_bom_combo_item(self):
-        if not self.bom_select_menu.currentText():
-            # 기본값 전체 설정
-            self.bom_select_menu.addItem('전체')
-            menu = []
-            # DB상 상품명을 중복되지 않게 메뉴 리스트에 삽입
-            for item in self.material_db:
-                if item[6] not in menu:
-                    menu.append(item[6])
-            # 메뉴 선택 콤보박스에 추가
-            for item in menu:
-                if item:
-                    self.bom_select_menu.addItem(item)
+        self.bom_select_menu.clear()
+        # 기본값 전체 설정
+        self.bom_select_menu.addItem('전체')
+        menu = []
+        # DB상 상품명을 중복되지 않게 메뉴 리스트에 삽입
+        for item in self.material_db:
+            if item[6] not in menu:
+                menu.append(item[6])
+        # 메뉴 선택 콤보박스에 추가
+        for item in menu:
+            if item:
+                self.bom_select_menu.addItem(item)
 
     def set_bom_table(self):
         self.bom_ingredient_table.verticalHeader().setVisible(False)
@@ -271,7 +271,8 @@ class MainPage(QWidget, MainUIset):
         self.bom_ingredient_table.setColumnWidth(2, 240)
 
         self.get_bom_table_db()
-        self.bom_select_menu.currentTextChanged.connect(self.menu_changed)
+        if len(self.bom_select_menu.currentText()) > 0:
+            self.bom_select_menu.currentTextChanged.connect(self.menu_changed)
 
     def get_bom_table_db(self):
 
@@ -309,46 +310,48 @@ class MainPage(QWidget, MainUIset):
             self.bom_table_default_data()
 
         else:
-            # bom_table_row, bom_table_column은 set_bom_table_data_tooltip 함수에서 각각 row, column으로 사용함
-            # 반복문에서의 i, j값과 별개로 데이터 축적시마다 1개씩 증가해 올바른 표의 행과 열에 들어감
-            bom_table_row = 0
-            self.bom_ingredient_table.setRowCount(bom_table_row)
+            if len(self.bom_select_menu.currentText()) > 0:
+                # bom_table_row, bom_table_column은 set_bom_table_data_tooltip 함수에서 각각 row, column으로 사용함
+                # 반복문에서의 i, j값과 별개로 데이터 축적시마다 1개씩 증가해 올바른 표의 행과 열에 들어감
+                bom_table_row = 0
+                self.bom_ingredient_table.setRowCount(bom_table_row)
 
-            for i in range(len(self.table_data)):
-                # self.table_data = [material_name, material_quantity+measure_unit, product_name GROUP BY material_name]
-                if self.bom_select_menu.currentText() in self.table_data[i][2]:
-                    bom_table_row += 1
-                    bom_table_column = 0
-                    self.bom_ingredient_table.setRowCount(bom_table_row)
+                for i in range(len(self.table_data)):
+                    # self.table_data = [material_name, material_quantity+measure_unit, product_name GROUP BY material_name]
+                    if self.bom_select_menu.currentText() in self.table_data[i][2]:
+                        bom_table_row += 1
+                        bom_table_column = 0
+                        self.bom_ingredient_table.setRowCount(bom_table_row)
 
-                    for j in range(len(self.table_data[i])):
-                        self.set_bom_table_data_tooltip(bom_table_row - 1, bom_table_column, i, j)
-                        bom_table_column += 1
+                        for j in range(len(self.table_data[i])):
+                            self.set_bom_table_data_tooltip(bom_table_row - 1, bom_table_column, i, j)
+                            bom_table_column += 1
 
     def set_bom_available(self):
         if self.bom_select_menu.currentText() == '전체':
             self.bom_available.setText('')
 
         else:
-            conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
-                                   db='project7smartstore')
-            c = conn.cursor()
+            if len(self.bom_select_menu.currentText()) > 0:
+                conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
+                                       db='project7smartstore')
+                c = conn.cursor()
 
-            # 콤보박스에서 선택된 메뉴의 재료들 중 가장 작은 재료재고/재료소모량 값을 가져옴
-            c.execute(f'''SELECT min(b.inventory_quantity DIV a.material_quantity) AS produce_available 
-            FROM bill_of_material AS a 
-            INNER JOIN material_management AS b 
-            ON a.material_name=b.material_name 
-            WHERE a.product_name="{self.bom_select_menu.currentText()}"''')
+                # 콤보박스에서 선택된 메뉴의 재료들 중 가장 작은 재료재고/재료소모량 값을 가져옴
+                c.execute(f'''SELECT min(b.inventory_quantity DIV a.material_quantity) AS produce_available 
+                FROM bill_of_material AS a 
+                INNER JOIN material_management AS b 
+                ON a.material_name=b.material_name 
+                WHERE a.product_name="{self.bom_select_menu.currentText()}"''')
 
-            producible = c.fetchall()[0][0]
+                producible = c.fetchall()[0][0]
 
-            if producible < 10:
-                self.bom_available.setStyleSheet("Color: red")
-            else:
-                self.bom_available.setStyleSheet("Color: black")
+                if producible < 10:
+                    self.bom_available.setStyleSheet("Color: red")
+                else:
+                    self.bom_available.setStyleSheet("Color: black")
 
-            self.bom_available.setText(f'{str(producible)}개 제작 가능')
+                self.bom_available.setText(f'{str(producible)}개 제작 가능')
 
     def buy_ingredient_window(self):
         self.ingredient_window.show()
