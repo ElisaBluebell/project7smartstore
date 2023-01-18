@@ -84,7 +84,7 @@ class MainPage(QWidget, MainUIset):
             self.le_sellnum.clear()
             self.Move_SellList()
         except pymysql.err.DataError:
-            msg = QMessageBox.information(self, "알림", "정보를 입력해주세요")
+            msg = QMessageBox.information(self, "알림", "정보를 확인해주세요")
             return
 
     def move_main(self):
@@ -212,7 +212,7 @@ class MainPage(QWidget, MainUIset):
 
             print(test, "test")
             if test != 0:
-                msg = QMessageBox.information(self, "알림", "이미 존재합니다.")
+                msg = QMessageBox.information(self, "알림", "이미 존재하는 상품명입니다.")
                 return
             cursor.execute("INSERT INTO project7smartstore.product_info "
                            f"(product_name,store_name,product_price) "
@@ -245,10 +245,10 @@ class MainPage(QWidget, MainUIset):
                                    f"'{temp2[0][0]}','{temp2[0][1]}')")
                     
         except AttributeError:
-            msg = QMessageBox.information(self, "알림", "잘못된 정보입니다. 확인해주세요.")
+            msg = QMessageBox.information(self, "알림", "정보를 입력해주세요.")
             return
         except pymysql.err.DataError:
-            msg = QMessageBox.information(self, "알림", "잘못된 정보입니다. 확인해주세요.")
+            msg = QMessageBox.information(self, "알림", "잘못된 정보입니다.")
             return
         except pymysql.err.OperationalError:
             msg = QMessageBox.information(self, "알림", " operational Error")
