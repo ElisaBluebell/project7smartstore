@@ -119,5 +119,6 @@ class BuyIngredient(QWidget):
             self.total_price.setText(f'''합계: {int(self.select_quantity.currentText()[:1]) * 
                                           (int(self.price_per_unit.text()[4:-1]))}원''')
 
+
     def purchase_ingredient(self):
         pass

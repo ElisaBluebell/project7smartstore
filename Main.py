@@ -275,25 +275,14 @@ class MainPage(QWidget, MainUIset):
                                db='project7smartstore')
         c = conn.cursor()
 
-        # material_name에 따라 product_name을 묶어주기 위한 view 생성
-        c.execute('''CREATE OR REPLACE VIEW product_group 
-        AS SELECT any_value(material_idx) AS material_idx, 
-        group_concat(product_name) AS product_name 
-        FROM bill_of_material 
-        GROUP BY material_name;''')
-
-        # 재료의 수량과 단위를 하나의 값으로 묶고 view, material_name 값을 함께 갖는 데이터 추출
-        c.execute('''SELECT DISTINCT b.material_name, 
-        (SELECT CONCAT(cast(b.inventory_quantity AS CHAR), a.measure_unit)) AS material_quantity, 
-        c.product_name 
-        FROM bill_of_material AS a 
-        LEFT JOIN material_management AS b 
-        ON b.material_name=a.material_name 
-        INNER JOIN product_group AS c 
-        ON c.material_idx=a.material_idx;''')
+        # 프로시저 호출
+        c.execute('call project7smartstore.group_product_by_material();')
 
         self.table_data = c.fetchall()
         self.bom_table_default_data()
+
+        c.close()
+        conn.close()
 
     def bom_table_default_data(self):
         self.bom_ingredient_table.setRowCount(len(self.table_data))
