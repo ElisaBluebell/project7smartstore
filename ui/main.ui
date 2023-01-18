@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="page">
     <widget class="QLabel" name="MAIN_LB_loginfo">
@@ -75,7 +75,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>재료주문</string>
+      <string>재고관리</string>
      </property>
     </widget>
     <widget class="QPushButton" name="MAIN_BT_seller_insert">
@@ -189,7 +189,7 @@
       </font>
      </property>
      <property name="text">
-      <string>재료 재고 관리</string>
+      <string>재고 관리</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
