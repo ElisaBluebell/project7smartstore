@@ -13,7 +13,6 @@ class Ingredient(QTabWidget):
         self.addTab(buy_ingredient, '재료 구매')
         self.addTab(manage_ingredient, '재료 관리')
         self.set_ui()
-        print(self)
 
     def set_ui(self):
         self.setFont(QtGui.QFont('D2Coding'))
@@ -184,7 +183,6 @@ class ManageIngredient(QWidget):
 
     def set_page(self):
         self.set_ui()
-        self.set_logic()
 
     def set_ui(self):
         self.set_text()
@@ -236,7 +234,10 @@ class ManageIngredient(QWidget):
         self.set_select_measurement_item()
 
     def set_select_name_item(self):
-        pass
+        sql = f'''SELECT material_name FROM bill_of_material'''
+        name = self.exe_db_smartstore(sql)
+        for item in name:
+            self.select_name.addItem(f'{item[0]}')
 
     def set_select_bundle_item(self):
         for i in range(1, 5):
@@ -249,13 +250,15 @@ class ManageIngredient(QWidget):
 
     def modify_ingredient(self):
         sql = f'''UPDATE material_management SET 
-        buy_unit={self.select_bundle.currentData()}, 
+        buy_unit="{self.select_bundle.currentData()}", 
         material_price={int(self.input_price.text())} 
-        WHERE material_name={self.select_name.currentText()}'''
+        WHERE material_name="{self.select_name.currentText()}"'''
         self.exe_db_smartstore(sql)
 
     def delete_ingredient(self):
-        sql = f'''DELETE FROM material_management WHERE material_name={self.select_name.currentText()}'''
+        sql = f'''DELETE FROM material_management WHERE material_name="{self.select_name.currentText()}"'''
+        self.exe_db_smartstore(sql)
+        sql = f'''DELETE FROM bill_of_material WHERE material_name="{self.select_name.currentText()}"'''
         self.exe_db_smartstore(sql)
 
     @staticmethod
@@ -265,6 +268,7 @@ class ManageIngredient(QWidget):
         c = conn.cursor()
 
         c.execute(sql)
+        conn.commit()
         loaded = c.fetchall()
 
         c.close()
