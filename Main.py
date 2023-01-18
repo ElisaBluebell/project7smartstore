@@ -203,24 +203,23 @@ class MainPage(QWidget, MainUIset):
                                f"WHERE product_name='{self.MAIN_LE_productName.text()}' and store_name='{self.UserInfo[5]}'")
                 temp2 = cursor.fetchall()
                 if check == 0 :
-                    cursor.execute("INSERT INTO project7smartstore.bill_of_material "
-                                   "(material_idx,material_name,material_quantity,measure_unit,product_idx,product_name) "
-                                   f"VALUES('PJ{str(temp).zfill(4)}',"
+                    cursor.execute(f"call project7smartstore.BoM_insert('PJ{str(temp).zfill(4)}',"
                                    f"'{self.MAIN_strorelist.item(i, 0).text()}',"
                                    f"'{self.MAIN_strorelist.item(i, 1).text()}',"
                                    f"'{self.MAIN_strorelist.cellWidget(i, 2).currentText()}',"
                                    f"'{temp2[0][0]}','{temp2[0][1]}')")
                 else:
-                    cursor.execute("insert into project7smartstore.bill_of_material "
-                                   "(material_idx,material_name,material_quantity,measure_unit,product_idx,product_name) "
-                                   f"VALUES('{info[0][0]}',"
+                    cursor.execute(f"call project7smartstore.BoM_insert('{info[0][0]}',"
                                    f"'{self.MAIN_strorelist.item(i, 0).text()}',"
                                    f"'{self.MAIN_strorelist.item(i, 1).text()}',"
                                    f"'{self.MAIN_strorelist.cellWidget(i, 2).currentText()}',"
                                    f"'{temp2[0][0]}','{temp2[0][1]}')")
                     
         except AttributeError:
-            msg = QMessageBox.information(self, "알림", "잘못된 정보입니다. 확인해주세요.")
+            msg = QMessageBox.information(self, "알림", "정보를 입력해주세요")
+            return
+        except pymysql.err.DataError:
+            msg = QMessageBox.information(self, "알림", "잘못된 정보입니다.")
             return
         db.commit()
         db.close()
