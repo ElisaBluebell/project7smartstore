@@ -201,11 +201,15 @@ class MainPage(QWidget, MainUIset):
                     return
 
         try:
+            if self.MAIN_LE_productName.text() == None or self.MAIN_LE_productName.text().strip() == "":
+                msg = QMessageBox.information(self, "알림", "정보를 입력해주세요")
+                return
             db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
             cursor = db.cursor()
             # 제품명 존재하는지 체크
             test = cursor.execute("SELECT product_idx FROM project7smartstore.product_info "
                                   f"WHERE product_name='{self.MAIN_LE_productName.text()}'")
+
             print(test, "test")
             if test != 0:
                 msg = QMessageBox.information(self, "알림", "이미 존재합니다.")
@@ -230,24 +234,24 @@ class MainPage(QWidget, MainUIset):
                                f"WHERE product_name='{self.MAIN_LE_productName.text()}' and store_name='{self.UserInfo[5]}'")
                 temp2 = cursor.fetchall()
                 if check == 0 :
-                    cursor.execute("INSERT INTO project7smartstore.bill_of_material "
-                                   "(material_idx,material_name,material_quantity,measure_unit,product_idx,product_name) "
-                                   f"VALUES('PJ{str(temp).zfill(4)}',"
-                                   f"'{self.MAIN_strorelist.item(i, 0).text()}',"
+                    cursor.execute(f"call project7smartstore.BoM_insert('PJ{str(temp).zfill(4)}','{self.MAIN_strorelist.item(i, 0).text()}',"
                                    f"'{self.MAIN_strorelist.item(i, 1).text()}',"
                                    f"'{self.MAIN_strorelist.cellWidget(i, 2).currentText()}',"
                                    f"'{temp2[0][0]}','{temp2[0][1]}')")
                 else:
-                    cursor.execute("insert into project7smartstore.bill_of_material "
-                                   "(material_idx,material_name,material_quantity,measure_unit,product_idx,product_name) "
-                                   f"VALUES('{info[0][0]}',"
-                                   f"'{self.MAIN_strorelist.item(i, 0).text()}',"
+                    cursor.execute(f"call project7smartstore.BoM_insert('{info[0][0]}','{self.MAIN_strorelist.item(i, 0).text()}',"
                                    f"'{self.MAIN_strorelist.item(i, 1).text()}',"
                                    f"'{self.MAIN_strorelist.cellWidget(i, 2).currentText()}',"
                                    f"'{temp2[0][0]}','{temp2[0][1]}')")
                     
         except AttributeError:
             msg = QMessageBox.information(self, "알림", "잘못된 정보입니다. 확인해주세요.")
+            return
+        except pymysql.err.DataError:
+            msg = QMessageBox.information(self, "알림", "잘못된 정보입니다. 확인해주세요.")
+            return
+        except pymysql.err.OperationalError:
+            msg = QMessageBox.information(self, "알림", " operational Error")
             return
         db.commit()
         db.close()
