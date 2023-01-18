@@ -5,7 +5,7 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import *
 
 from Login import LoginPage
-from buy_ingredient_window import Ingredient
+from buy_ingredient_window import BuyIngredient
 
 
 MainUIset = uic.loadUiType("ui/main.ui")[0]
@@ -33,8 +33,9 @@ class MainPage(QWidget, MainUIset):
         self.BT_toMain2.clicked.connect(self.move_main)
         self.BT_toMain3.clicked.connect(self.move_main)
         self.BT_toBuy.clicked.connect(self.Check_order)
+
         self.MAIN_BT_seller_order.clicked.connect(self.move_to_bill_of_material)
-        self.ingredient_window = Ingredient()
+        self.ingredient_window = BuyIngredient()
 
 
 
@@ -260,7 +261,6 @@ class MainPage(QWidget, MainUIset):
         c = conn.cursor()
 
         c. execute('SELECT * FROM `project7smartstore`.`bill_of_material`')
-        # 0 = BoM idx, 1 = 재료 idx, 2 = 재료명, 3 = 재료 소모량, 4 = 계량 단위, 5 = 상품(사용처) idx, 6 = 상품명
         self.material_db = c.fetchall()
 
         c.close()
@@ -268,10 +268,9 @@ class MainPage(QWidget, MainUIset):
 
     def move_to_bill_of_material(self):
         self.set_material_db()
-        # User_Info 0 = 유저 idx, 1 = 유저 id, 2 = 유저 pw, 3 = 유저명, 4 = 전화번호, 5 = 상호명, 6 = 유저 분류
-        self.bom_store_name.setText(self.UserInfo[5])
 
         self.bom_go_back.clicked.connect(self.bom_to_main)
+
         self.buy_ingredient.clicked.connect(self.buy_ingredient_window)
 
         self.define_bom_combo_item()
@@ -281,14 +280,11 @@ class MainPage(QWidget, MainUIset):
 
     def define_bom_combo_item(self):
         if not self.bom_select_menu.currentText():
-            # 기본값 전체 설정
             self.bom_select_menu.addItem('전체')
             menu = []
-            # DB상 상품명을 중복되지 않게 메뉴 리스트에 삽입
             for item in self.material_db:
                 if item[6] not in menu:
                     menu.append(item[6])
-            # 메뉴 선택 콤보박스에 추가
             for item in menu:
                 if item:
                     self.bom_select_menu.addItem(item)
@@ -300,7 +296,8 @@ class MainPage(QWidget, MainUIset):
         self.bom_ingredient_table.setColumnWidth(2, 240)
 
         self.get_bom_table_db()
-        self.bom_select_menu.currentTextChanged.connect(self.menu_changed)
+
+        self.bom_select_menu.currentTextChanged.connect(self.set_bom_table_logic)
 
     def get_bom_table_db(self):
 
@@ -308,82 +305,60 @@ class MainPage(QWidget, MainUIset):
                                db='project7smartstore')
         c = conn.cursor()
 
-        c.execute('call project7smartstore.group_product_by_material();')
+        # material_name에 따라 product_name을 묶어주기 위한 view 생성
+        c.execute('''CREATE OR REPLACE VIEW product_group 
+        AS SELECT any_value(material_idx) AS material_idx, 
+        group_concat(product_name) AS product_name 
+        FROM bill_of_material 
+        GROUP BY material_name;''')
 
-        # 프로시저 호출을 통해 받아온 DB값, 0 = 재료명(명칭과 계량 단위가 겹치지 않음), 1 = 보유 수량, 2 = 사용처 그룹
+        # 재료의 수량과 단위를 하나의 값으로 묶고 view, material_name 값을 함께 갖는 데이터 추출
+        c.execute('''SELECT DISTINCT b.material_name, 
+        (SELECT CONCAT(cast(b.inventory_quantity AS CHAR), a.measure_unit)) AS material_quantity, 
+        c.product_name 
+        FROM bill_of_material AS a 
+        LEFT JOIN material_management AS b 
+        ON b.material_name=a.material_name 
+        INNER JOIN product_group AS c 
+        ON c.material_idx=a.material_idx;''')
+
         self.table_data = c.fetchall()
         self.bom_table_default_data()
 
-        c.close()
-        conn.close()
-
     def bom_table_default_data(self):
-        # 프로시저를 통해 받아온 DB의 요소 수만큼 반복함
         self.bom_ingredient_table.setRowCount(len(self.table_data))
-
         for i in range(len(self.table_data)):
             for j in range(len(self.table_data[i])):
                 self.set_bom_table_data_tooltip(i, j, i, j)
-
-    def set_bom_table_data_tooltip(self, row, column, i, j):
-        self.bom_ingredient_table.setItem(row, column, QTableWidgetItem(self.table_data[i][j]))
-        self.bom_ingredient_table.item(row, column).setToolTip(self.table_data[i][j])
-
-    def menu_changed(self):
-        self.set_bom_table_logic()
-        self.set_bom_available()
 
     def set_bom_table_logic(self):
         if self.bom_select_menu.currentText() == '전체':
             self.bom_table_default_data()
 
         else:
-            # bom_table_row, bom_table_column은 set_bom_table_data_tooltip 함수에서 각각 row, column으로 사용함
-            # 반복문에서의 i, j값과 별개로 데이터 축적시마다 1개씩 증가해 올바른 표의 행과 열에 들어감
             bom_table_row = 0
             self.bom_ingredient_table.setRowCount(bom_table_row)
-
             for i in range(len(self.table_data)):
                 # self.table_data = [material_name, material_quantity+measure_unit, product_name GROUP BY material_name]
                 if self.bom_select_menu.currentText() in self.table_data[i][2]:
                     bom_table_row += 1
                     bom_table_column = 0
                     self.bom_ingredient_table.setRowCount(bom_table_row)
-
                     for j in range(len(self.table_data[i])):
                         self.set_bom_table_data_tooltip(bom_table_row - 1, bom_table_column, i, j)
                         bom_table_column += 1
 
-    def set_bom_available(self):
-        if self.bom_select_menu.currentText() == '전체':
-            self.bom_available.setText('')
-
-        else:
-            conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
-                                   db='project7smartstore')
-            c = conn.cursor()
-
-            # 콤보박스에서 선택된 메뉴의 재료들 중 가장 작은 재료재고/재료소모량 값을 가져옴
-            c.execute(f'''SELECT min(b.inventory_quantity DIV a.material_quantity) AS produce_available 
-            FROM bill_of_material AS a 
-            INNER JOIN material_management AS b 
-            ON a.material_name=b.material_name 
-            WHERE a.product_name="{self.bom_select_menu.currentText()}"''')
-
-            producible = c.fetchall()[0][0]
-
-            if producible < 10:
-                self.bom_available.setStyleSheet("Color: red")
-            else:
-                self.bom_available.setStyleSheet("Color: black")
-
-            self.bom_available.setText(f'{str(producible)}개 제작 가능')
+    def set_bom_table_data_tooltip(self, row, column, i, j):
+        self.bom_ingredient_table.setItem(row, column, QTableWidgetItem(self.table_data[i][j]))
+        self.bom_ingredient_table.item(row, column).setToolTip(self.table_data[i][j])
 
     def buy_ingredient_window(self):
         self.ingredient_window.show()
 
     def bom_to_main(self):
         self.MAIN_STACK.setCurrentIndex(0)
+
+
 
 
 if __name__ == '__main__':

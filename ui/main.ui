@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="page">
     <widget class="QLabel" name="MAIN_LB_loginfo">
@@ -69,22 +69,22 @@
      <property name="geometry">
       <rect>
        <x>180</x>
-       <y>460</y>
+       <y>510</y>
        <width>91</width>
-       <height>91</height>
+       <height>41</height>
       </rect>
      </property>
      <property name="text">
-      <string>재고관리</string>
+      <string>재료주문</string>
      </property>
     </widget>
     <widget class="QPushButton" name="MAIN_BT_seller_insert">
      <property name="geometry">
       <rect>
        <x>30</x>
-       <y>460</y>
+       <y>510</y>
        <width>91</width>
-       <height>91</height>
+       <height>41</height>
       </rect>
      </property>
      <property name="text">
@@ -97,7 +97,7 @@
        <x>30</x>
        <y>560</y>
        <width>91</width>
-       <height>91</height>
+       <height>41</height>
       </rect>
      </property>
      <property name="text">
@@ -110,11 +110,43 @@
        <x>180</x>
        <y>560</y>
        <width>91</width>
-       <height>91</height>
+       <height>41</height>
       </rect>
      </property>
      <property name="text">
       <string>주문내역</string>
+     </property>
+    </widget>
+    <widget class="QFrame" name="F_seller">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>80</y>
+       <width>251</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
+    <widget class="QFrame" name="frame_2">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>160</y>
+       <width>251</width>
+       <height>101</height>
+      </rect>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
      </property>
     </widget>
    </widget>
@@ -122,9 +154,9 @@
     <widget class="QPushButton" name="buy_ingredient">
      <property name="geometry">
       <rect>
-       <x>270</x>
+       <x>140</x>
        <y>620</y>
-       <width>70</width>
+       <width>75</width>
        <height>23</height>
       </rect>
      </property>
@@ -189,13 +221,13 @@
       </font>
      </property>
      <property name="text">
-      <string>재고 관리</string>
+      <string>재료 재고 관리</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
      </property>
     </widget>
-    <widget class="QLabel" name="bom_menu_name">
+    <widget class="QLabel" name="bom_select_menu_2">
      <property name="geometry">
       <rect>
        <x>40</x>
@@ -242,7 +274,7 @@
       <rect>
        <x>360</x>
        <y>620</y>
-       <width>70</width>
+       <width>75</width>
        <height>23</height>
       </rect>
      </property>
@@ -265,7 +297,7 @@
       </font>
      </property>
      <property name="text">
-      <string/>
+      <string>상호명</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -279,27 +311,6 @@
        <width>141</width>
        <height>22</height>
       </rect>
-     </property>
-    </widget>
-    <widget class="QLabel" name="bom_available">
-     <property name="geometry">
-      <rect>
-       <x>230</x>
-       <y>160</y>
-       <width>81</width>
-       <height>21</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>D2Coding</family>
-      </font>
-     </property>
-     <property name="text">
-      <string/>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
     </widget>
    </widget>
@@ -325,6 +336,12 @@
        <width>430</width>
        <height>471</height>
       </rect>
+     </property>
+     <property name="showDropIndicator" stdset="0">
+      <bool>false</bool>
+     </property>
+     <property name="dragDropOverwriteMode">
+      <bool>false</bool>
      </property>
      <column>
       <property name="text">
@@ -701,6 +718,105 @@
      </column>
     </widget>
     <widget class="QPushButton" name="BT_toMain3">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>메인</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="page_6">
+    <widget class="QTableWidget" name="MAIN_malist">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>80</y>
+       <width>430</width>
+       <height>341</height>
+      </rect>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectRows</enum>
+     </property>
+     <column>
+      <property name="text">
+       <string>재료번호</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>재료명</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>가격</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>단위갯수</string>
+      </property>
+     </column>
+    </widget>
+    <widget class="QLabel" name="malist_title">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>10</y>
+       <width>451</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>D2Coding</family>
+       <pointsize>18</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>재료 리스트</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="malist_insert">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>460</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>재료추가</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="malist_update">
+     <property name="geometry">
+      <rect>
+       <x>190</x>
+       <y>460</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>재료수정</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="BT_toMain4">
      <property name="geometry">
       <rect>
        <x>10</x>
