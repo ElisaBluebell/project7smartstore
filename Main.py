@@ -305,6 +305,8 @@ class MainPage(QWidget, MainUIset):
             self.bom_table_default_data()
 
         else:
+            # bom_table_row, bom_table_column은 set_bom_table_data_tooltip 함수에서 각각 row, column으로 사용함
+            # 반복문에서의 i, j값과 별개로 데이터 축적시마다 1개씩 증가해 올바른 표의 행과 열에 들어감
             bom_table_row = 0
             self.bom_ingredient_table.setRowCount(bom_table_row)
 
