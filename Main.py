@@ -347,7 +347,7 @@ class MainPage(QWidget, MainUIset):
                 self.bom_available.setStyleSheet("Color: red")
             else:
                 self.bom_available.setStyleSheet("Color: black")
-            print(producible)
+
             self.bom_available.setText(f'{str(producible)}개 제작 가능')
 
     def buy_ingredient_window(self):
