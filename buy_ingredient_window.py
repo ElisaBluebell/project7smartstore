@@ -2,7 +2,7 @@ import pymysql
 
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QComboBox
+from PyQt5.QtWidgets import QWidget, QLabel, QPushButton, QComboBox, QMessageBox
 
 
 class BuyIngredient(QWidget):
@@ -84,6 +84,7 @@ class BuyIngredient(QWidget):
         INNER JOIN bill_of_material AS b 
         ON a.material_name=b.material_name''')
 
+        # 0 = 재료명, 1 = 재료구매단위, 2 = 재료가격, 3 = 재료재고, 4 = 계량단위
         self.ingredient_list = c.fetchall()
 
         c.close()
@@ -103,22 +104,52 @@ class BuyIngredient(QWidget):
         self.select_quantity.clear()
         i = 0
         j = 0
+        # 콤보박스에 해당하는 재료명 탐색, 찾으면 탐색 멈춤, i값을 인덱스로 설정
         for i in range(len(self.ingredient_list)):
             if self.ingredient_list[i][0] == self.select_ingredient.currentText():
                 break
-        self.have_quantity.setText(f'{self.ingredient_list[i][3]}{self.ingredient_list[i][4]}')
-        while (self.ingredient_list[i][1] * j) + self.ingredient_list[i][3] < self.ingredient_list[i][1] * 10:
+
+        # 구매 단위의 9배수까지 반복해서 앞자리 수를 추가함
+        while (self.ingredient_list[i][1] * j) + self.ingredient_list[i][3] <= self.ingredient_list[i][1] * 9:
             j += 1
-            self.select_quantity.addItem(str(j * self.ingredient_list[i][3])+self.ingredient_list[i][4])
+            # 앞자리 수*구매단위(1*1000=1000, 8*10=80) 등으로 구매 단위에 맞춰 구매수량 추가
+            self.select_quantity.addItem(str(j * self.ingredient_list[i][1])+self.ingredient_list[i][4])
+
+        # 해당 재료에 맞춰 라벨값 반응
+        self.set_responsive_label_text(i)
+
+    def set_responsive_label_text(self, i):
+        # 현재 보유량 = 보유수량 + 계량단위
+        self.have_quantity.setText(f'{self.ingredient_list[i][3]}{self.ingredient_list[i][4]}')
         self.price_per_unit.setText(f'단가: {str(self.ingredient_list[i][2])}원')
+
         self.select_quantity.currentTextChanged.connect(self.calculate_total_price)
         self.calculate_total_price()
 
     def calculate_total_price(self):
+        # 수량이 빈 값이 아닌 경우(초기화로 인해 비는 경우를 제외)
         if len(self.select_quantity.currentText()) != 0:
+            # 선택한 수량의 맨 앞자리 수(set_select_quantity 함수의 j값) * 단가
             self.total_price.setText(f'''합계: {int(self.select_quantity.currentText()[:1]) * 
                                           (int(self.price_per_unit.text()[4:-1]))}원''')
 
-
     def purchase_ingredient(self):
-        pass
+        if len(self.select_quantity.currentText()) != 0:
+            conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
+                                   db='project7smartstore')
+            c = conn.cursor()
+
+            c.execute(f'''UPDATE material_management 
+            SET inventory_quantity=inventory_quantity+(buy_unit*{int(self.select_quantity.currentText()[:1])}) 
+            WHERE material_name="{self.select_ingredient.currentText()}"''')
+            conn.commit()
+
+            c.close()
+            conn.close()
+
+            # 변경된 DB를 다시 읽어 라벨과 체크박스 재설정
+            self.set_db()
+            self.set_select_quantity()
+
+        else:
+            QMessageBox.warning(self, '구매 불가', '더이상 구매할 수 없습니다.')
