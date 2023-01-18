@@ -114,7 +114,7 @@ class BuyIngredient(QWidget):
                 break
 
         # 구매 단위의 9배수까지 반복해서 앞자리 수를 추가함
-        while (self.ingredient_list[i][1] * j) + self.ingredient_list[i][3] <= self.ingredient_list[i][1] * 9:
+        while (self.ingredient_list[i][1] * j) + self.ingredient_list[i][1] <= self.ingredient_list[i][1] * 9:
             j += 1
             # 앞자리 수*구매단위(1*1000=1000, 8*10=80) 등으로 구매 단위에 맞춰 구매수량 추가
             self.select_quantity.addItem(str(j * self.ingredient_list[i][1])+self.ingredient_list[i][4])
@@ -258,14 +258,15 @@ class ManageIngredient(QWidget):
             self.select_measurement.addItem(measurement[i])
 
     def modify_ingredient(self):
-        # if '*' in self.
+        name = self.check_new_name()
+
         sql = f'''UPDATE material_management SET  
         material_price={int(self.input_price.text())} 
-        WHERE material_name="{self.select_name.currentText()}"'''
+        WHERE material_name="{name}"'''
         self.exe_db_smartstore(sql)
-
+        print(name)
         sql = f'''UPDATE bill_of_material SET
-        buy_unit="{self.select_bundle.currentData()}"'''
+        measure_unit="{self.select_bundle.currentData()}"'''
         self.exe_db_smartstore(sql)
         
         QMessageBox.information(self, '수정', '수정되었습니다.')
@@ -277,6 +278,13 @@ class ManageIngredient(QWidget):
         self.exe_db_smartstore(sql)
 
         QMessageBox.information(self, '삭제', '삭제되었습니다.')
+
+    def check_new_name(self):
+        if '*' in self.select_name.currentText():
+            name = self.select_name.currentText()[:-1]
+        else:
+            name = self.select_name.currentText()
+        return name
 
     @staticmethod
     def exe_db_smartstore(sql):
