@@ -318,7 +318,8 @@ class MainPage(QWidget, MainUIset):
                 self.bom_ingredient_table.setRowCount(bom_table_row)
 
                 for i in range(len(self.table_data)):
-                    # self.table_data = [material_name, material_quantity+measure_unit, product_name GROUP BY material_name]
+                    # self.table_data =
+                    # [material_name, material_quantity+measure_unit, product_name GROUP BY material_name]
                     if self.bom_select_menu.currentText() in self.table_data[i][2]:
                         bom_table_row += 1
                         bom_table_column = 0
@@ -375,6 +376,7 @@ class MainPage(QWidget, MainUIset):
         store_faq_data = self.check_store_match_faq(faq_data)
         self.set_faq_table_rowcount(store_faq_data)
         self.faq_data_putin_table(store_faq_data)
+        self.faq_table.clicked.connect(self.faq_detail)
 
     def set_faq_btn(self):
         self.faq_go_back.clicked.connect(self.faq_to_bom)
@@ -382,10 +384,8 @@ class MainPage(QWidget, MainUIset):
     def set_faq_label(self):
         self.faq_store_name.setText(f'{self.UserInfo[5]}')
 
-    def faq_to_bom(self):
-        self.MAIN_STACK.setCurrentIndex(1)
-
-    def get_faq_data(self):
+    @staticmethod
+    def get_faq_data():
         conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
                                db='project7smartstore')
         c = conn.cursor()
@@ -399,9 +399,8 @@ class MainPage(QWidget, MainUIset):
         return faq_data
 
     def check_store_match_faq(self, faq_data):
+        store_faq = []
         for i in range(len(faq_data)):
-            store_faq = []
-
             if self.UserInfo[0] == faq_data[i][1]:
                 store_faq.append(faq_data[i])
 
@@ -415,11 +414,23 @@ class MainPage(QWidget, MainUIset):
             self.faq_table.setItem(i, 0, QTableWidgetItem(store_faq_data[i][4]))
             self.faq_table.setItem(i, 1, QTableWidgetItem(str(store_faq_data[i][7])))
             self.faq_table.setItem(i, 2, QTableWidgetItem(store_faq_data[i][6]))
-            self.faq_table.setItem(i, 3, QTableWidgetItem(store_faq_data[i][9]))
+            self.faq_table.setItem(i, 3, QTableWidgetItem(self.faq_process_int_to_str(store_faq_data[i][9])))
 
-    def faq_process_int_to_str(self, faq_process):
+    @staticmethod
+    def faq_process_int_to_str(faq_process):
         if faq_process == 0:
-            faq_process_text
+            faq_process_text = '접수'
+
+        else:
+            faq_process_text = '완료'
+
+        return faq_process_text
+
+    def faq_detail(self):
+        table_row = self.faq_table.currentRow()
+
+    def faq_to_bom(self):
+        self.MAIN_STACK.setCurrentIndex(1)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

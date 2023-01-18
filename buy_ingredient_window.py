@@ -119,7 +119,7 @@ class BuyIngredient(QWidget):
                 break
 
         # 구매 단위의 9배수까지 반복해서 앞자리 수를 추가함
-        while (self.ingredient_list[i][1] * j) + self.ingredient_list[i][3] <= self.ingredient_list[i][1] * 9:
+        while (self.ingredient_list[i][1] * j) + self.ingredient_list[i][3] <= self.ingredient_list[i][1] * 8:
             j += 1
             # 앞자리 수*구매단위(1*1000=1000, 8*10=80) 등으로 구매 단위에 맞춰 구매수량 추가
             self.select_quantity.addItem(str(j * self.ingredient_list[i][1]) + self.ingredient_list[i][4])
@@ -244,7 +244,9 @@ class ManageIngredient(QWidget):
     def set_select_name_item(self):
         self.select_name.clear()
 
-        sql = f'''SELECT material_name, buy_unit FROM material_management'''
+        sql = f'''SELECT material_name, 
+        buy_unit 
+        FROM material_management'''
         name_unit = self.exe_db_smartstore(sql)
 
         new_item_tooltip = ''
@@ -289,8 +291,8 @@ class ManageIngredient(QWidget):
                 QMessageBox.information(self, '수정', '수정되었습니다.')
                 self.reset_select_name_item()
 
-        except:
-            pass
+        except ValueError:
+            QMessageBox.warning(self, '입력 오류', '가격은 숫자로 입력해주세요.')
 
     def delete_ingredient(self):
         name = self.check_new_name()
