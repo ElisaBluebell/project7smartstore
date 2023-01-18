@@ -231,6 +231,7 @@ class MainPage(QWidget, MainUIset):
         c = conn.cursor()
 
         c. execute('SELECT * FROM `project7smartstore`.`bill_of_material`')
+        # 0 = BoM idx, 1 = 재료 idx, 2 = 재료명, 3 = 재료 소모량, 4 = 계량 단위, 5 = 상품(사용처) idx, 6 = 상품명
         self.material_db = c.fetchall()
 
         c.close()
@@ -238,6 +239,7 @@ class MainPage(QWidget, MainUIset):
 
     def move_to_bill_of_material(self):
         self.set_material_db()
+        # User_Info 0 = 유저 idx, 1 = 유저 id, 2 = 유저 pw, 3 = 유저명, 4 = 전화번호, 5 = 상호명, 6 = 유저 분류
         self.bom_store_name.setText(self.UserInfo[5])
 
         self.bom_go_back.clicked.connect(self.bom_to_main)
@@ -250,11 +252,14 @@ class MainPage(QWidget, MainUIset):
 
     def define_bom_combo_item(self):
         if not self.bom_select_menu.currentText():
+            # 기본값 전체 설정
             self.bom_select_menu.addItem('전체')
             menu = []
+            # DB상 상품명을 중복되지 않게 메뉴 리스트에 삽입
             for item in self.material_db:
                 if item[6] not in menu:
                     menu.append(item[6])
+            # 메뉴 선택 콤보박스에 추가
             for item in menu:
                 if item:
                     self.bom_select_menu.addItem(item)
@@ -266,7 +271,6 @@ class MainPage(QWidget, MainUIset):
         self.bom_ingredient_table.setColumnWidth(2, 240)
 
         self.get_bom_table_db()
-
         self.bom_select_menu.currentTextChanged.connect(self.set_bom_table_logic)
 
     def get_bom_table_db(self):
@@ -275,9 +279,9 @@ class MainPage(QWidget, MainUIset):
                                db='project7smartstore')
         c = conn.cursor()
 
-        # 프로시저 호출
         c.execute('call project7smartstore.group_product_by_material();')
 
+        # 프로시저 호출을 통해 받아온 DB값, 0 = 재료명(명칭과 계량 단위가 겹치지 않음), 1 = 보유 수량, 2 = 사용처 그룹
         self.table_data = c.fetchall()
         self.bom_table_default_data()
 
@@ -285,10 +289,16 @@ class MainPage(QWidget, MainUIset):
         conn.close()
 
     def bom_table_default_data(self):
+        # 프로시저를 통해 받아온 DB의 요소 수만큼 반복함
         self.bom_ingredient_table.setRowCount(len(self.table_data))
+
         for i in range(len(self.table_data)):
             for j in range(len(self.table_data[i])):
                 self.set_bom_table_data_tooltip(i, j, i, j)
+
+    def set_bom_table_data_tooltip(self, row, column, i, j):
+        self.bom_ingredient_table.setItem(row, column, QTableWidgetItem(self.table_data[i][j]))
+        self.bom_ingredient_table.item(row, column).setToolTip(self.table_data[i][j])
 
     def set_bom_table_logic(self):
         if self.bom_select_menu.currentText() == '전체':
@@ -297,19 +307,17 @@ class MainPage(QWidget, MainUIset):
         else:
             bom_table_row = 0
             self.bom_ingredient_table.setRowCount(bom_table_row)
+
             for i in range(len(self.table_data)):
                 # self.table_data = [material_name, material_quantity+measure_unit, product_name GROUP BY material_name]
                 if self.bom_select_menu.currentText() in self.table_data[i][2]:
                     bom_table_row += 1
                     bom_table_column = 0
                     self.bom_ingredient_table.setRowCount(bom_table_row)
+
                     for j in range(len(self.table_data[i])):
                         self.set_bom_table_data_tooltip(bom_table_row - 1, bom_table_column, i, j)
                         bom_table_column += 1
-
-    def set_bom_table_data_tooltip(self, row, column, i, j):
-        self.bom_ingredient_table.setItem(row, column, QTableWidgetItem(self.table_data[i][j]))
-        self.bom_ingredient_table.item(row, column).setToolTip(self.table_data[i][j])
 
     def buy_ingredient_window(self):
         self.ingredient_window.show()
