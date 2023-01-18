@@ -249,10 +249,13 @@ class ManageIngredient(QWidget):
             self.select_measurement.addItem(measurement[i])
 
     def modify_ingredient(self):
-        sql = f'''UPDATE material_management SET 
-        buy_unit="{self.select_bundle.currentData()}", 
+        sql = f'''UPDATE material_management SET  
         material_price={int(self.input_price.text())} 
         WHERE material_name="{self.select_name.currentText()}"'''
+        self.exe_db_smartstore(sql)
+
+        sql = f'''UPDATE bill_of_material SET
+        buy_unit="{self.select_bundle.currentData()}"'''
         self.exe_db_smartstore(sql)
 
     def delete_ingredient(self):
