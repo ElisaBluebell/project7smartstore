@@ -23,7 +23,7 @@
     </rect>
    </property>
    <property name="currentIndex">
-    <number>0</number>
+    <number>7</number>
    </property>
    <widget class="QWidget" name="page">
     <widget class="QLabel" name="MAIN_LB_loginfo">
@@ -930,84 +930,7 @@
      </property>
     </widget>
    </widget>
-   <widget class="QWidget" name="page_6">
-    <widget class="QLabel" name="bom_title_2">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>50</y>
-       <width>451</width>
-       <height>41</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>D2Coding</family>
-       <pointsize>18</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>주문 내역</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-    <widget class="QTableWidget" name="MAIN_buylist">
-     <property name="geometry">
-      <rect>
-       <x>40</x>
-       <y>140</y>
-       <width>401</width>
-       <height>411</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>D2Coding</family>
-      </font>
-     </property>
-     <property name="editTriggers">
-      <set>QAbstractItemView::NoEditTriggers</set>
-     </property>
-     <attribute name="horizontalHeaderCascadingSectionResizes">
-      <bool>false</bool>
-     </attribute>
-     <column>
-      <property name="text">
-       <string>상품명</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>갯수</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>가격</string>
-      </property>
-     </column>
-     <column>
-      <property name="text">
-       <string>상호명</string>
-      </property>
-     </column>
-    </widget>
-    <widget class="QPushButton" name="BT_toMain3">
-     <property name="geometry">
-      <rect>
-       <x>30</x>
-       <y>20</y>
-       <width>75</width>
-       <height>23</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>메인</string>
-     </property>
-    </widget>
-   </widget>
+   <widget class="QWidget" name="page_6"/>
    <widget class="QWidget" name="page_7">
     <widget class="QLabel" name="bom_selltitle">
      <property name="geometry">
@@ -1124,6 +1047,84 @@
      </property>
      <property name="text">
       <string>주문확인</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="page_8">
+    <widget class="QLabel" name="bom_title_2">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>70</y>
+       <width>451</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>D2Coding</family>
+       <pointsize>18</pointsize>
+      </font>
+     </property>
+     <property name="text">
+      <string>주문 내역</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+    <widget class="QTableWidget" name="MAIN_buylist">
+     <property name="geometry">
+      <rect>
+       <x>40</x>
+       <y>160</y>
+       <width>401</width>
+       <height>411</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>D2Coding</family>
+      </font>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <attribute name="horizontalHeaderCascadingSectionResizes">
+      <bool>false</bool>
+     </attribute>
+     <column>
+      <property name="text">
+       <string>상품명</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>갯수</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>가격</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>상호명</string>
+      </property>
+     </column>
+    </widget>
+    <widget class="QPushButton" name="BT_toMain3">
+     <property name="geometry">
+      <rect>
+       <x>30</x>
+       <y>40</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>메인</string>
      </property>
     </widget>
    </widget>
