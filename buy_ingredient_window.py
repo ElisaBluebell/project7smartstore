@@ -185,7 +185,6 @@ class ManageIngredient(QWidget):
         self.select_measurement = QComboBox(self)
 
         self.set_page()
-        self.buy_ingredient = BuyIngredient()
 
     def set_page(self):
         self.set_ui()
@@ -198,9 +197,6 @@ class ManageIngredient(QWidget):
         self.set_etc()
 
         self.set_select_name_item()
-
-    def set_logic(self):
-        pass
 
     def set_text(self):
         self.title.setText('재료 관리')
@@ -247,11 +243,23 @@ class ManageIngredient(QWidget):
         sql = f'''SELECT material_name, 
         buy_unit 
         FROM material_management'''
-        name_unit = self.exe_db_smartstore(sql)
+        name_and_unit = self.exe_db_smartstore(sql)
 
+        self.put_item_in_select_name(name_and_unit)
+
+    def set_select_bundle_item(self):
+        for i in range(1, 5):
+            self.select_bundle.addItem(str(1) + i * str(0), int(str(1) + i * str(0)))
+
+    def set_select_measurement_item(self):
+        measurement = ['개', 'g', 'ml']
+        for i in range(len(measurement)):
+            self.select_measurement.addItem(measurement[i])
+
+    def put_item_in_select_name(self, name_and_unit):
         new_item_tooltip = ''
 
-        for item in name_unit:
+        for item in name_and_unit:
             if item[1] == 0:
                 # 툴팁으로 등록하기 위해 텍스트 더함
                 new_item_tooltip += f'{item[0]} '
@@ -262,15 +270,6 @@ class ManageIngredient(QWidget):
             else:
                 self.select_name.addItem(f'{item[0]}')
         self.select_name.setToolTip(f'{new_item_tooltip}등록 필요')
-
-    def set_select_bundle_item(self):
-        for i in range(1, 5):
-            self.select_bundle.addItem(str(1) + i * str(0), int(str(1) + i * str(0)))
-
-    def set_select_measurement_item(self):
-        measurement = ['개', 'g', 'ml']
-        for i in range(len(measurement)):
-            self.select_measurement.addItem(measurement[i])
 
     def modify_ingredient(self):
         try:
