@@ -5,10 +5,11 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import *
 
 from Login import LoginPage
-from buy_ingredient_window import BuyIngredient
-
+from buy_ingredient_window import Ingredient
 
 MainUIset = uic.loadUiType("ui/main.ui")[0]
+
+
 class MainPage(QWidget, MainUIset):
     def __init__(self):
         super().__init__()
@@ -35,12 +36,12 @@ class MainPage(QWidget, MainUIset):
         self.BT_toBuy.clicked.connect(self.Check_order)
 
         self.MAIN_BT_seller_order.clicked.connect(self.move_to_bill_of_material)
-        self.ingredient_window = BuyIngredient()
+        self.ingredient_window = Ingredient()
 
 
 
     def Move_buylist(self):
-        self.MAIN_STACK.setCurrentIndex(4)
+        self.MAIN_STACK.setCurrentIndex(5)
         db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
         cursor = db.cursor()
         a = cursor.execute("SELECT * "
@@ -55,10 +56,10 @@ class MainPage(QWidget, MainUIset):
         self.MAIN_buylist.setRowCount(a)
         self.MAIN_buylist.setColumnCount(4)
         for i in range(a):
-            self.MAIN_buylist.setItem(i, 0, QTableWidgetItem(str(buylist[i][3])))
-            self.MAIN_buylist.setItem(i, 1, QTableWidgetItem(str(buylist[i][4])))
-            self.MAIN_buylist.setItem(i, 2, QTableWidgetItem(str(buylist[i][11])))
-            self.MAIN_buylist.setItem(i, 3, QTableWidgetItem(str(buylist[i][6])))
+            self.MAIN_buylist.setItem(i, 0, QTableWidgetItem(str(buylist[i][4])))
+            self.MAIN_buylist.setItem(i, 1, QTableWidgetItem(str(buylist[i][5])))
+            self.MAIN_buylist.setItem(i, 2, QTableWidgetItem(str(buylist[i][12])))
+            self.MAIN_buylist.setItem(i, 3, QTableWidgetItem(str(buylist[i][7])))
 
 
 
@@ -72,7 +73,12 @@ class MainPage(QWidget, MainUIset):
                            f"WHERE project7smartstore.product_info.store_name='{self.lb_storeName2.text()}' and "
                            f"project7smartstore.product_info.product_name='{self.lb_productname2.text()}'")
             a = cursor.fetchall()
-            print(a)
+            print("a",a)
+            cursor.execute(f'call project7smartstore.material_num_check("{self.lb_productname2.text()}")')
+            num = cursor.fetchone()[0]
+            if num < int(self.le_sellnum.text()):
+                msg = QMessageBox.information(self, "알림", "구매 수량을 확인해주세요")
+                return
             cursor.execute("INSERT INTO project7smartstore.order_management "
                            f"(product_idx,product_name,product_quantity,customer_idx,seller_idx,store_name) "
                            f"values('{a[0][7]}','{a[0][8]}','{self.le_sellnum.text()}','{self.UserInfo[0]}',"
@@ -83,7 +89,7 @@ class MainPage(QWidget, MainUIset):
             self.le_sellnum.clear()
             self.Move_SellList()
         except pymysql.err.DataError:
-            msg = QMessageBox.information(self, "알림", "정보를 확인해주세요")
+            msg = QMessageBox.information(self, "알림", "정보를 입력해주세요")
             return
 
     def move_main(self):
@@ -91,6 +97,9 @@ class MainPage(QWidget, MainUIset):
 
     def check_selllist(self, signal):
         if signal == 0:
+            if self.MAIN_sellList.item(self.MAIN_sellList.currentRow(),3).text() == "구매불가":
+                msg = QMessageBox.information(self, "알림", "구매할 수 없는 상품입니다.")
+                return
             self.frame.show()
             self.le_sellnum.clear()
             self.lb_productname2.setText(self.MAIN_sellList.item(self.MAIN_sellList.currentRow(), 0).text())
@@ -120,6 +129,15 @@ class MainPage(QWidget, MainUIset):
             self.MAIN_sellList.setItem(i, 0, QTableWidgetItem(str(sellList[i][8])))
             self.MAIN_sellList.setItem(i, 1, QTableWidgetItem(str(sellList[i][9])))
             self.MAIN_sellList.setItem(i, 2, QTableWidgetItem(str(sellList[i][10])))
+            conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
+                                   db='project7smartstore')
+            c = conn.cursor()
+            #재고확인해서 만들 수 있는 갯수 체크
+            c.execute(f'call material_num_check("{str(sellList[i][8])}")')
+            sellnum = c.fetchall()[0][0]
+            if sellnum == 0 or sellnum == None:
+                sellnum = '구매불가'
+            self.MAIN_sellList.setItem(i, 3, QTableWidgetItem(str(sellnum)))
         self.frame.hide()
 
     def BT_setting(self):
@@ -200,18 +218,14 @@ class MainPage(QWidget, MainUIset):
                     return
 
         try:
-            if self.MAIN_LE_productName.text() == None or self.MAIN_LE_productName.text().strip() == "":
-                msg = QMessageBox.information(self, "알림", "정보를 입력해주세요")
-                return
             db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
             cursor = db.cursor()
             # 제품명 존재하는지 체크
             test = cursor.execute("SELECT product_idx FROM project7smartstore.product_info "
                                   f"WHERE product_name='{self.MAIN_LE_productName.text()}'")
-
             print(test, "test")
             if test != 0:
-                msg = QMessageBox.information(self, "알림", "이미 존재하는 상품명입니다.")
+                msg = QMessageBox.information(self, "알림", "이미 존재합니다.")
                 return
             cursor.execute("INSERT INTO project7smartstore.product_info "
                            f"(product_name,store_name,product_price) "
@@ -233,24 +247,23 @@ class MainPage(QWidget, MainUIset):
                                f"WHERE product_name='{self.MAIN_LE_productName.text()}' and store_name='{self.UserInfo[5]}'")
                 temp2 = cursor.fetchall()
                 if check == 0 :
-                    cursor.execute(f"call project7smartstore.BoM_insert('PJ{str(temp).zfill(4)}','{self.MAIN_strorelist.item(i, 0).text()}',"
+                    cursor.execute(f"call project7smartstore.BoM_insert('PJ{str(temp).zfill(4)}',"
+                                   f"'{self.MAIN_strorelist.item(i, 0).text()}',"
                                    f"'{self.MAIN_strorelist.item(i, 1).text()}',"
                                    f"'{self.MAIN_strorelist.cellWidget(i, 2).currentText()}',"
                                    f"'{temp2[0][0]}','{temp2[0][1]}')")
                 else:
-                    cursor.execute(f"call project7smartstore.BoM_insert('{info[0][0]}','{self.MAIN_strorelist.item(i, 0).text()}',"
+                    cursor.execute(f"call project7smartstore.BoM_insert('{info[0][0]}',"
+                                   f"'{self.MAIN_strorelist.item(i, 0).text()}',"
                                    f"'{self.MAIN_strorelist.item(i, 1).text()}',"
                                    f"'{self.MAIN_strorelist.cellWidget(i, 2).currentText()}',"
                                    f"'{temp2[0][0]}','{temp2[0][1]}')")
                     
         except AttributeError:
-            msg = QMessageBox.information(self, "알림", "정보를 입력해주세요.")
+            msg = QMessageBox.information(self, "알림", "정보를 입력해주세요")
             return
         except pymysql.err.DataError:
             msg = QMessageBox.information(self, "알림", "잘못된 정보입니다.")
-            return
-        except pymysql.err.OperationalError:
-            msg = QMessageBox.information(self, "알림", " operational Error")
             return
         db.commit()
         db.close()
@@ -261,6 +274,7 @@ class MainPage(QWidget, MainUIset):
         c = conn.cursor()
 
         c. execute('SELECT * FROM `project7smartstore`.`bill_of_material`')
+        # 0 = BoM idx, 1 = 재료 idx, 2 = 재료명, 3 = 재료 소모량, 4 = 계량 단위, 5 = 상품(사용처) idx, 6 = 상품명
         self.material_db = c.fetchall()
 
         c.close()
@@ -268,9 +282,10 @@ class MainPage(QWidget, MainUIset):
 
     def move_to_bill_of_material(self):
         self.set_material_db()
+        # User_Info 0 = 유저 idx, 1 = 유저 id, 2 = 유저 pw, 3 = 유저명, 4 = 전화번호, 5 = 상호명, 6 = 유저 분류
+        self.bom_store_name.setText(self.UserInfo[5])
 
         self.bom_go_back.clicked.connect(self.bom_to_main)
-
         self.buy_ingredient.clicked.connect(self.buy_ingredient_window)
 
         self.define_bom_combo_item()
@@ -279,15 +294,18 @@ class MainPage(QWidget, MainUIset):
         self.MAIN_STACK.setCurrentIndex(1)
 
     def define_bom_combo_item(self):
-        if not self.bom_select_menu.currentText():
-            self.bom_select_menu.addItem('전체')
-            menu = []
-            for item in self.material_db:
-                if item[6] not in menu:
-                    menu.append(item[6])
-            for item in menu:
-                if item:
-                    self.bom_select_menu.addItem(item)
+        self.bom_select_menu.clear()
+        # 기본값 전체 설정
+        self.bom_select_menu.addItem('전체')
+        menu = []
+        # DB상 상품명을 중복되지 않게 메뉴 리스트에 삽입
+        for item in self.material_db:
+            if item[6] not in menu:
+                menu.append(item[6])
+        # 메뉴 선택 콤보박스에 추가
+        for item in menu:
+            if item:
+                self.bom_select_menu.addItem(item)
 
     def set_bom_table(self):
         self.bom_ingredient_table.verticalHeader().setVisible(False)
@@ -296,8 +314,8 @@ class MainPage(QWidget, MainUIset):
         self.bom_ingredient_table.setColumnWidth(2, 240)
 
         self.get_bom_table_db()
-
-        self.bom_select_menu.currentTextChanged.connect(self.set_bom_table_logic)
+        if len(self.bom_select_menu.currentText()) > 0:
+            self.bom_select_menu.currentTextChanged.connect(self.menu_changed)
 
     def get_bom_table_db(self):
 
@@ -305,61 +323,155 @@ class MainPage(QWidget, MainUIset):
                                db='project7smartstore')
         c = conn.cursor()
 
-        # material_name에 따라 product_name을 묶어주기 위한 view 생성
-        c.execute('''CREATE OR REPLACE VIEW product_group 
-        AS SELECT any_value(material_idx) AS material_idx, 
-        group_concat(product_name) AS product_name 
-        FROM bill_of_material 
-        GROUP BY material_name;''')
+        c.execute('call project7smartstore.group_product_by_material();')
 
-        # 재료의 수량과 단위를 하나의 값으로 묶고 view, material_name 값을 함께 갖는 데이터 추출
-        c.execute('''SELECT DISTINCT b.material_name, 
-        (SELECT CONCAT(cast(b.inventory_quantity AS CHAR), a.measure_unit)) AS material_quantity, 
-        c.product_name 
-        FROM bill_of_material AS a 
-        LEFT JOIN material_management AS b 
-        ON b.material_name=a.material_name 
-        INNER JOIN product_group AS c 
-        ON c.material_idx=a.material_idx;''')
-
+        # 프로시저 호출을 통해 받아온 DB값, 0 = 재료명(명칭과 계량 단위가 겹치지 않음), 1 = 보유 수량, 2 = 사용처 그룹
         self.table_data = c.fetchall()
         self.bom_table_default_data()
 
+        c.close()
+        conn.close()
+
     def bom_table_default_data(self):
+        # 프로시저를 통해 받아온 DB의 요소 수만큼 반복함
         self.bom_ingredient_table.setRowCount(len(self.table_data))
+
         for i in range(len(self.table_data)):
             for j in range(len(self.table_data[i])):
                 self.set_bom_table_data_tooltip(i, j, i, j)
+
+    def set_bom_table_data_tooltip(self, row, column, i, j):
+        self.bom_ingredient_table.setItem(row, column, QTableWidgetItem(self.table_data[i][j]))
+        self.bom_ingredient_table.item(row, column).setToolTip(self.table_data[i][j])
+
+    def menu_changed(self):
+        self.set_bom_table_logic()
+        self.set_bom_available()
 
     def set_bom_table_logic(self):
         if self.bom_select_menu.currentText() == '전체':
             self.bom_table_default_data()
 
         else:
-            bom_table_row = 0
-            self.bom_ingredient_table.setRowCount(bom_table_row)
-            for i in range(len(self.table_data)):
-                # self.table_data = [material_name, material_quantity+measure_unit, product_name GROUP BY material_name]
-                if self.bom_select_menu.currentText() in self.table_data[i][2]:
-                    bom_table_row += 1
-                    bom_table_column = 0
-                    self.bom_ingredient_table.setRowCount(bom_table_row)
-                    for j in range(len(self.table_data[i])):
-                        self.set_bom_table_data_tooltip(bom_table_row - 1, bom_table_column, i, j)
-                        bom_table_column += 1
+            if len(self.bom_select_menu.currentText()) > 0:
+                # bom_table_row, bom_table_column은 set_bom_table_data_tooltip 함수에서 각각 row, column으로 사용함
+                # 반복문에서의 i, j값과 별개로 데이터 축적시마다 1개씩 증가해 올바른 표의 행과 열에 들어감
+                bom_table_row = 0
+                self.bom_ingredient_table.setRowCount(bom_table_row)
 
-    def set_bom_table_data_tooltip(self, row, column, i, j):
-        self.bom_ingredient_table.setItem(row, column, QTableWidgetItem(self.table_data[i][j]))
-        self.bom_ingredient_table.item(row, column).setToolTip(self.table_data[i][j])
+                for i in range(len(self.table_data)):
+                    # self.table_data = [material_name, material_quantity+measure_unit, product_name GROUP BY material_name]
+                    if self.bom_select_menu.currentText() in self.table_data[i][2]:
+                        bom_table_row += 1
+                        bom_table_column = 0
+                        self.bom_ingredient_table.setRowCount(bom_table_row)
+
+                        for j in range(len(self.table_data[i])):
+                            self.set_bom_table_data_tooltip(bom_table_row - 1, bom_table_column, i, j)
+                            bom_table_column += 1
+
+    def set_bom_available(self):
+        if self.bom_select_menu.currentText() == '전체':
+            self.bom_available.setText('')
+
+        else:
+            if len(self.bom_select_menu.currentText()) > 0:
+                conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
+                                       db='project7smartstore')
+                c = conn.cursor()
+
+                # 콤보박스에서 선택된 메뉴의 재료들 중 가장 작은 재료재고/재료소모량 값을 가져옴
+                c.execute(f'''SELECT min(b.inventory_quantity DIV a.material_quantity) AS produce_available 
+                FROM bill_of_material AS a 
+                INNER JOIN material_management AS b 
+                ON a.material_name=b.material_name 
+                WHERE a.product_name="{self.bom_select_menu.currentText()}"''')
+
+                producible = c.fetchall()[0][0]
+
+                if producible < 10:
+                    self.bom_available.setStyleSheet("Color: red")
+                else:
+                    self.bom_available.setStyleSheet("Color: black")
+
+                self.bom_available.setText(f'{str(producible)}개 제작 가능')
 
     def buy_ingredient_window(self):
+        self.ingredient_window.reset_items()
         self.ingredient_window.show()
 
     def bom_to_main(self):
         self.MAIN_STACK.setCurrentIndex(0)
 
+    def move_to_faq(self):
+        self.set_faq_page()
+        self.MAIN_STACK.setCurrentIndex(4)
 
+    def set_faq_page(self):
+        self.set_faq_table()
+        self.set_faq_btn()
+        self.set_faq_label()
 
+    def set_faq_table(self):
+        faq_data = self.get_faq_data()
+        store_faq_data = self.check_store_match_faq(faq_data)
+        self.set_faq_table_rowcount(store_faq_data)
+        self.faq_data_putin_table(store_faq_data)
+        self.faq_table.clicked.connect(self.faq_detail)
+
+    def set_faq_btn(self):
+        self.faq_go_back.clicked.connect(self.faq_to_bom)
+
+    def set_faq_label(self):
+        self.faq_store_name.setText(f'{self.UserInfo[5]}')
+
+    @staticmethod
+    def get_faq_data():
+        conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
+                               db='project7smartstore')
+        c = conn.cursor()
+
+        c.execute('SELECT * FROM faq_management')
+        faq_data = c.fetchall()
+
+        c.close()
+        conn.close()
+
+        return faq_data
+
+    def check_store_match_faq(self, faq_data):
+        store_faq = []
+        for i in range(len(faq_data)):
+            if self.UserInfo[0] == faq_data[i][1]:
+                store_faq.append(faq_data[i])
+
+        return store_faq
+
+    def set_faq_table_rowcount(self, store_faq_data):
+        self.faq_table.setRowCount(len(store_faq_data))
+
+    def faq_data_putin_table(self, store_faq_data):
+        for i in range(len(store_faq_data)):
+            self.faq_table.setItem(i, 0, QTableWidgetItem(store_faq_data[i][4]))
+            self.faq_table.setItem(i, 1, QTableWidgetItem(str(store_faq_data[i][7])))
+            self.faq_table.setItem(i, 2, QTableWidgetItem(store_faq_data[i][6]))
+            self.faq_table.setItem(i, 3, QTableWidgetItem(self.faq_process_int_to_str(store_faq_data[i][9])))
+
+    @staticmethod
+    def faq_process_int_to_str(faq_process):
+        if faq_process == 0:
+            faq_process_text = '접수'
+
+        else:
+            faq_process_text = '완료'
+
+        return faq_process_text
+
+    def faq_detail(self):
+        table_row = self.faq_table.currentRow()
+
+    def faq_to_bom(self):
+        self.MAIN_STACK.setCurrentIndex(1)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
