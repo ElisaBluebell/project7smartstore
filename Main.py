@@ -1,5 +1,6 @@
 import random
 import sys
+import threading
 import time
 from threading import Thread
 
@@ -134,7 +135,7 @@ class MainPage(QWidget, MainUIset):
             self.MAIN_selllist.setItem(i, 4, QTableWidgetItem(str(Blist[i][5])))
             self.MAIN_selllist.setItem(i, 5, QTableWidgetItem(str(Blist[i][5]*Blist[i][9])))
     def Move_buylist(self):
-        self.MAIN_STACK.setCurrentIndex(5)
+        self.MAIN_STACK.setCurrentIndex(7)
         db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
         cursor = db.cursor()
         a = cursor.execute("SELECT * "
@@ -201,26 +202,6 @@ class MainPage(QWidget, MainUIset):
                         temp.setText(" ")
                     time.sleep(2)
 
-    def Move_buylist(self):
-        self.MAIN_STACK.setCurrentIndex(4)
-        db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
-        cursor = db.cursor()
-        a = cursor.execute("SELECT * "
-                           "FROM project7smartstore.order_management INNER JOIN project7smartstore.product_info "
-                           "ON project7smartstore.order_management.product_idx = project7smartstore.product_info.product_idx "
-                           f"WHERE project7smartstore.order_management.customer_idx = '{self.UserInfo[0]}'")
-        print(a)
-        if a == 0 :
-            return
-        buylist = cursor.fetchall()
-        print("[",buylist)
-        self.MAIN_buylist.setRowCount(a)
-        self.MAIN_buylist.setColumnCount(4)
-        for i in range(a):
-            self.MAIN_buylist.setItem(i, 0, QTableWidgetItem(str(buylist[i][3])))
-            self.MAIN_buylist.setItem(i, 1, QTableWidgetItem(str(buylist[i][4])))
-            self.MAIN_buylist.setItem(i, 2, QTableWidgetItem(str(buylist[i][11])))
-            self.MAIN_buylist.setItem(i, 3, QTableWidgetItem(str(buylist[i][6])))
 
     def Check_order(self):
         try:
