@@ -515,8 +515,7 @@ class MainPage(QWidget, MainUIset):
                 for menu_name in menu_db:
                     menu.append(menu_name[0])
 
-                odered_comment = ['맛있어요.', '맛없어요.', '너무 매워요.', '너무 달아요.', '너무 써요', '너무 많아요.', '너무 적어요.',
-                          '왜 팔아요?', '배달이 늦었어요.']
+                odered_comment = ['맛있어요.', '맛없어요.', '너무 매워요.', '너무 달아요.', '너무 써요', '너무 많아요.', '너무 적어요.', '왜 팔아요?', '배달이 늦었어요.']
                 not_odered_comment = ['맛있나요?', '맵나요?', '양 많은가요?', '왜 팔아요?']
                 if random.randint(0, 1) == 1:
                     if len(ordered_customer) > 5:
@@ -524,11 +523,11 @@ class MainPage(QWidget, MainUIset):
                             faq_content = f'{menu[random.randint(0, len(menu) - 1)]} ' \
                                          f'{odered_comment[random.randint(0, len(odered_comment) - 1)]}'
                             c.execute(f'''INSERT INTO faq_management
-                            (seller_idx, seller_name, buyer_idx, buyer_name, product_idx, product_name, order_idx, faq_content) 
-                            VALUES({self.UserInfo[0]}, '{self.UserInfo[3]}', {ordered_customer[0][0]}, '{ordered_customer[0][1]}', 
-                            {ordered_customer[0][2]}, '{ordered_customer[0][3]}', {ordered_customer[0][4]}, '{faq_content}')''')
+                            (seller_idx, seller_name, buyer_idx, buyer_name, product_idx, product_name, order_idx, 
+                            faq_content) VALUES({self.UserInfo[0]}, '{self.UserInfo[3]}', {ordered_customer[0][0]}, 
+                            '{ordered_customer[0][1]}', {ordered_customer[0][2]}, '{ordered_customer[0][3]}', 
+                            {ordered_customer[0][4]}, '{faq_content}')''')
                             conn.commit()
-                            print(1)
 
                     else:
                         faq_content = f'{menu[random.randint(0, len(menu) - 1)]} ' \
@@ -539,7 +538,6 @@ class MainPage(QWidget, MainUIset):
                         '{not_ordered_customer[0][1]}', {not_ordered_customer[0][2]}, '{not_ordered_customer[0][3]}', 
                         '{faq_content}')''')
                         conn.commit()
-                        print(1)
 
                 c.close()
                 conn.close()

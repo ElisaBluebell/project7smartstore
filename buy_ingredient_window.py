@@ -178,7 +178,6 @@ class ManageIngredient(QWidget):
         self.input_price = QLineEdit(self)
 
         self.modify = QPushButton(self)
-        self.delete = QPushButton(self)
 
         self.select_name = QComboBox(self)
         self.select_bundle = QComboBox(self)
@@ -205,7 +204,6 @@ class ManageIngredient(QWidget):
         self.bundle.setText('수량')
         self.measurement.setText('단위')
 
-        self.delete.setText('삭제')
         self.modify.setText('수정')
 
     def set_geometry(self):
@@ -216,8 +214,6 @@ class ManageIngredient(QWidget):
         self.measurement.setGeometry(160, 90, 40, 20)
 
         self.input_price.setGeometry(60, 90, 80, 20)
-
-        self.delete.setGeometry(20, 130, 75, 23)
         self.modify.setGeometry(220, 130, 75, 23)
 
         self.select_name.setGeometry(60, 50, 80, 20)
@@ -225,7 +221,6 @@ class ManageIngredient(QWidget):
         self.select_measurement.setGeometry(200, 90, 95, 20)
 
     def set_connect(self):
-        self.delete.clicked.connect(self.delete_ingredient)
         self.modify.clicked.connect(self.modify_ingredient)
 
     def set_etc(self):
