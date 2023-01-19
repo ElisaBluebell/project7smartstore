@@ -42,7 +42,7 @@ class MainPage(QWidget, MainUIset):
 
 
     def Move_buylist(self):
-        self.MAIN_STACK.setCurrentIndex(4)
+        self.MAIN_STACK.setCurrentIndex(5)
         db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
         cursor = db.cursor()
         a = cursor.execute("SELECT * "
@@ -57,10 +57,10 @@ class MainPage(QWidget, MainUIset):
         self.MAIN_buylist.setRowCount(a)
         self.MAIN_buylist.setColumnCount(4)
         for i in range(a):
-            self.MAIN_buylist.setItem(i, 0, QTableWidgetItem(str(buylist[i][3])))
-            self.MAIN_buylist.setItem(i, 1, QTableWidgetItem(str(buylist[i][4])))
-            self.MAIN_buylist.setItem(i, 2, QTableWidgetItem(str(buylist[i][11])))
-            self.MAIN_buylist.setItem(i, 3, QTableWidgetItem(str(buylist[i][6])))
+            self.MAIN_buylist.setItem(i, 0, QTableWidgetItem(str(buylist[i][4])))
+            self.MAIN_buylist.setItem(i, 1, QTableWidgetItem(str(buylist[i][5])))
+            self.MAIN_buylist.setItem(i, 2, QTableWidgetItem(str(buylist[i][12])))
+            self.MAIN_buylist.setItem(i, 3, QTableWidgetItem(str(buylist[i][7])))
 
 
 
@@ -74,7 +74,12 @@ class MainPage(QWidget, MainUIset):
                            f"WHERE project7smartstore.product_info.store_name='{self.lb_storeName2.text()}' and "
                            f"project7smartstore.product_info.product_name='{self.lb_productname2.text()}'")
             a = cursor.fetchall()
-            print(a)
+            print("a",a)
+            cursor.execute(f'call project7smartstore.material_num_check("{self.lb_productname2.text()}")')
+            num = cursor.fetchone()[0]
+            if num < int(self.le_sellnum.text()):
+                msg = QMessageBox.information(self, "알림", "구매 수량을 확인해주세요")
+                return
             cursor.execute("INSERT INTO project7smartstore.order_management "
                            f"(product_idx,product_name,product_quantity,customer_idx,seller_idx,store_name) "
                            f"values('{a[0][7]}','{a[0][8]}','{self.le_sellnum.text()}','{self.UserInfo[0]}',"
@@ -93,6 +98,9 @@ class MainPage(QWidget, MainUIset):
 
     def check_selllist(self, signal):
         if signal == 0:
+            if self.MAIN_sellList.item(self.MAIN_sellList.currentRow(),3).text() == "구매불가":
+                msg = QMessageBox.information(self, "알림", "구매할 수 없는 상품입니다.")
+                return
             self.frame.show()
             self.le_sellnum.clear()
             self.lb_productname2.setText(self.MAIN_sellList.item(self.MAIN_sellList.currentRow(), 0).text())
@@ -122,6 +130,15 @@ class MainPage(QWidget, MainUIset):
             self.MAIN_sellList.setItem(i, 0, QTableWidgetItem(str(sellList[i][8])))
             self.MAIN_sellList.setItem(i, 1, QTableWidgetItem(str(sellList[i][9])))
             self.MAIN_sellList.setItem(i, 2, QTableWidgetItem(str(sellList[i][10])))
+            conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
+                                   db='project7smartstore')
+            c = conn.cursor()
+            #재고확인해서 만들 수 있는 갯수 체크
+            c.execute(f'call material_num_check("{str(sellList[i][8])}")')
+            sellnum = c.fetchall()[0][0]
+            if sellnum == 0 or sellnum == None:
+                sellnum = '구매불가'
+            self.MAIN_sellList.setItem(i, 3, QTableWidgetItem(str(sellnum)))
         self.frame.hide()
 
     def BT_setting(self):
@@ -235,24 +252,23 @@ class MainPage(QWidget, MainUIset):
                                f"WHERE product_name='{self.MAIN_LE_productName.text()}' and store_name='{self.UserInfo[5]}'")
                 temp2 = cursor.fetchall()
                 if check == 0 :
-                    cursor.execute(f"call project7smartstore.BoM_insert('PJ{str(temp).zfill(4)}','{self.MAIN_strorelist.item(i, 0).text()}',"
+                    cursor.execute(f"call project7smartstore.BoM_insert('PJ{str(temp).zfill(4)}',"
+                                   f"'{self.MAIN_strorelist.item(i, 0).text()}',"
                                    f"'{self.MAIN_strorelist.item(i, 1).text()}',"
                                    f"'{self.MAIN_strorelist.cellWidget(i, 2).currentText()}',"
                                    f"'{temp2[0][0]}','{temp2[0][1]}')")
                 else:
-                    cursor.execute(f"call project7smartstore.BoM_insert('{info[0][0]}','{self.MAIN_strorelist.item(i, 0).text()}',"
+                    cursor.execute(f"call project7smartstore.BoM_insert('{info[0][0]}',"
+                                   f"'{self.MAIN_strorelist.item(i, 0).text()}',"
                                    f"'{self.MAIN_strorelist.item(i, 1).text()}',"
                                    f"'{self.MAIN_strorelist.cellWidget(i, 2).currentText()}',"
                                    f"'{temp2[0][0]}','{temp2[0][1]}')")
                     
         except AttributeError:
-            msg = QMessageBox.information(self, "알림", "잘못된 정보입니다. 확인해주세요.")
+            msg = QMessageBox.information(self, "알림", "정보를 입력해주세요")
             return
         except pymysql.err.DataError:
-            msg = QMessageBox.information(self, "알림", "잘못된 정보입니다. 확인해주세요.")
-            return
-        except pymysql.err.OperationalError:
-            msg = QMessageBox.information(self, "알림", " operational Error")
+            msg = QMessageBox.information(self, "알림", "잘못된 정보입니다.")
             return
         db.commit()
         db.close()
@@ -349,8 +365,7 @@ class MainPage(QWidget, MainUIset):
                 self.bom_ingredient_table.setRowCount(bom_table_row)
 
                 for i in range(len(self.table_data)):
-                    # self.table_data =
-                    # [material_name, material_quantity+measure_unit, product_name GROUP BY material_name]
+                    # self.table_data = [material_name, material_quantity+measure_unit, product_name GROUP BY material_name]
                     if self.bom_select_menu.currentText() in self.table_data[i][2]:
                         bom_table_row += 1
                         bom_table_column = 0
