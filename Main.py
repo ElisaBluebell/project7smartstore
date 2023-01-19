@@ -642,21 +642,17 @@ class MainPage(QWidget, MainUIset):
                         if random.randint(0, 1) == 1:
                             faq_content = f'{menu[random.randint(0, len(menu) - 1)]} ' \
                                           f'{odered_comment[random.randint(0, len(odered_comment) - 1)]}'
-                            c.execute(f'''INSERT INTO faq_management
-                            (seller_idx, seller_name, buyer_idx, buyer_name, product_idx, product_name, order_idx, 
-                            faq_content) VALUES({self.UserInfo[0]}, '{self.UserInfo[3]}', {ordered_customer[0][0]}, 
-                            '{ordered_customer[0][1]}', {ordered_customer[0][2]}, '{ordered_customer[0][3]}', 
-                            {ordered_customer[0][4]}, '{faq_content}')''')
+                            c.execute(f'''CALL comment_of_ordered_customer({self.UserInfo[0]}, "{self.UserInfo[3]}", 
+                            {ordered_customer[0][0]}, "{ordered_customer[0][1]}", {ordered_customer[0][2]}, 
+                            "{ordered_customer[0][3]}", {ordered_customer[0][4]}, "{faq_content}")''')
                             conn.commit()
 
                     else:
                         faq_content = f'{menu[random.randint(0, len(menu) - 1)]} ' \
                                       f'{not_odered_comment[random.randint(0, len(not_odered_comment) - 1)]}'
-                        c.execute(f'''INSERT INTO faq_management
-                        (seller_idx, seller_name, buyer_idx, buyer_name, product_idx, product_name, faq_content) 
-                        VALUES({self.UserInfo[0]}, '{self.UserInfo[3]}', {not_ordered_customer[0][0]}, 
-                        '{not_ordered_customer[0][1]}', {not_ordered_customer[0][2]}, '{not_ordered_customer[0][3]}', 
-                        '{faq_content}')''')
+                        c.execute(f'''CALL comment_of_non_ordered_customer({self.UserInfo[0]}, "{self.UserInfo[3]}", 
+                        {not_ordered_customer[0][0]}, "{not_ordered_customer[0][1]}", {not_ordered_customer[0][2]}, 
+                        "{not_ordered_customer[0][3]}", "{faq_content}")''')
                         conn.commit()
 
                 c.close()
