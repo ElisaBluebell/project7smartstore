@@ -47,15 +47,15 @@ class MainPage(QWidget, MainUIset):
         self.faq_management.clicked.connect(self.move_to_faq)
         self.ingredient_window = Ingredient()
         self.customer_service = ''
-        auto_faq = threading.Thread(target=self.make_auto_faq, daemon=True)
-        auto_faq.start()
+
 
         self.order_checked.clicked.connect(self.order_accept)
         self.BT_alert.clicked.connect(self.Move_selllist)
         self.BT_alert2.clicked.connect(self.Move_selllist)
         self.BT_alert3.clicked.connect(self.Move_selllist)
-        # 012
 
+        auto_faq = threading.Thread(target=self.make_auto_faq, daemon=True)
+        auto_faq.start()
         self.tete.clicked.connect(self.auto_ordering)
 
     def auto_ordering(self):
@@ -228,6 +228,9 @@ class MainPage(QWidget, MainUIset):
         except pymysql.err.DataError:
             msg = QMessageBox.information(self, "알림", "정보를 입력해주세요")
             return
+        except ValueError:
+            msg = QMessageBox.information(self, "알림", "수량을 입력해주세요")
+            return
 
     def move_main(self):
         self.MAIN_STACK.setCurrentIndex(0)
@@ -246,7 +249,7 @@ class MainPage(QWidget, MainUIset):
             try:
                 self.lb_totalPrice2.show()
                 self.lb_totalPrice.setText(f"{int(self.le_sellnum.text()) * int(self.lb_price2.text())}")
-            except:
+            except ValueError:
                 self.lb_totalPrice.setText(" ")
                 self.lb_totalPrice2.hide()
 
