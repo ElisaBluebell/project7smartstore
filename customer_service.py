@@ -1,7 +1,7 @@
 import pymysql
 from PyQt5 import QtGui
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QLabel, QPushButton, QTextBrowser, QWidget, QLineEdit
+from PyQt5.QtWidgets import QLabel, QPushButton, QTextBrowser, QWidget, QLineEdit, QMessageBox
 
 
 class CustomerService(QWidget):
@@ -73,6 +73,8 @@ class CustomerService(QWidget):
 
         self.exe_db_smartstore(sql)
 
+        QMessageBox.information(self, '답변 등록 완료', '답변이 등록되었습니다.')
+
     def change_faq_status_read(self):
         sql = f'''UPDATE faq_management SET 
         faq_process=1 
@@ -96,5 +98,4 @@ class CustomerService(QWidget):
         return loaded
 
     def close_window(self):
-        print(self.faq_db)
         self.close()
