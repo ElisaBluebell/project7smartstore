@@ -529,16 +529,12 @@ class MainPage(QWidget, MainUIset):
                 c = conn.cursor()
 
                 # 콤보박스에서 선택된 메뉴의 재료들 중 가장 작은 재료재고/재료소모량 값을 가져옴
-                c.execute(f'''SELECT min(b.inventory_quantity DIV a.material_quantity) AS produce_available 
-                FROM bill_of_material AS a 
-                INNER JOIN material_management AS b 
-                ON a.material_name=b.material_name 
-                WHERE a.product_name="{self.bom_select_menu.currentText()}"''')
-
+                c.execute(f'''CALL get_minimun_ingredient_left("{self.bom_select_menu.currentText()}")''')
                 producible = c.fetchall()[0][0]
 
                 if producible < 10:
                     self.bom_available.setStyleSheet("Color: red")
+
                 else:
                     self.bom_available.setStyleSheet("Color: black")
 
@@ -630,23 +626,10 @@ class MainPage(QWidget, MainUIset):
                 c.execute('SELECT product_name FROM product_info')
                 menu_db = c.fetchall()
 
-                c.execute('''SELECT DISTINCT c.user_idx, c.user_name, a.product_idx, a.product_name, a.order_idx
-                FROM order_management AS a
-                INNER JOIN faq_management AS b
-                INNER JOIN user_info AS c
-                ON a.customer_idx = c.user_idx
-                WHERE a.order_idx NOT IN (
-                SELECT order_idx
-                FROM faq_management
-                );''')
+                c.execute('''CALL get_ordered_customer_db;''')
                 ordered_customer = c.fetchall()
 
-                c.execute('''SELECT * FROM user_info AS a 
-                JOIN product_info AS b 
-                WHERE a.user_type NOT IN(
-                SELECT user_type FROM user_info 
-                WHERE store_name=FALSE
-                )''')
+                c.execute('''CALL get_non_ordered_customer_db;''')
                 not_ordered_customer = c.fetchall()
                 for menu_name in menu_db:
                     menu.append(menu_name[0])
