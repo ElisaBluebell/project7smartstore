@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import *
 
 from Login import LoginPage
 from buy_ingredient_window import Ingredient
+from customer_service import CustomerService
 
 MainUIset = uic.loadUiType("ui/main.ui")[0]
 
@@ -38,6 +39,7 @@ class MainPage(QWidget, MainUIset):
         self.MAIN_BT_seller_order.clicked.connect(self.move_to_bill_of_material)
         self.faq_management.clicked.connect(self.move_to_faq)
         self.ingredient_window = Ingredient()
+        self.customer_service = ''
 
 
 
@@ -365,7 +367,8 @@ class MainPage(QWidget, MainUIset):
                 self.bom_ingredient_table.setRowCount(bom_table_row)
 
                 for i in range(len(self.table_data)):
-                    # self.table_data = [material_name, material_quantity+measure_unit, product_name GROUP BY material_name]
+                    # self.table_data =
+                    # [material_name, material_quantity+measure_unit, product_name GROUP BY material_name]
                     if self.bom_select_menu.currentText() in self.table_data[i][2]:
                         bom_table_row += 1
                         bom_table_column = 0
@@ -422,7 +425,7 @@ class MainPage(QWidget, MainUIset):
         store_faq_data = self.check_store_match_faq(faq_data)
         self.set_faq_table_rowcount(store_faq_data)
         self.faq_data_putin_table(store_faq_data)
-        self.faq_table.clicked.connect(self.faq_detail)
+        self.faq_table.clicked.connect(lambda: self.faq_detail(store_faq_data))
 
     def set_faq_btn(self):
         self.faq_go_back.clicked.connect(self.faq_to_bom)
@@ -465,18 +468,24 @@ class MainPage(QWidget, MainUIset):
     @staticmethod
     def faq_process_int_to_str(faq_process):
         if faq_process == 0:
-            faq_process_text = '접수'
+            faq_process_text = '읽지 않음'
+
+        elif faq_process == 1:
+            faq_process_text = '읽음'
 
         else:
-            faq_process_text = '완료'
+            faq_process_text = '답변 완료'
 
         return faq_process_text
 
-    def faq_detail(self):
+    def faq_detail(self, store_faq_data):
         table_row = self.faq_table.currentRow()
+        self.customer_service = CustomerService(store_faq_data[table_row])
+        self.customer_service.show()
 
     def faq_to_bom(self):
         self.MAIN_STACK.setCurrentIndex(1)
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
