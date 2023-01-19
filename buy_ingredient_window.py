@@ -138,9 +138,11 @@ class BuyIngredient(QWidget):
     def calculate_total_price(self):
         # 수량이 빈 값이 아닌 경우(초기화로 인해 비는 경우를 제외)
         if len(self.select_quantity.currentText()) != 0:
-            # 선택한 수량의 맨 앞자리 수(set_select_quantity 함수의 j값) * 단가
+            # 선택한 수량의 맨 앞자리 수(set_select_quantity 함수의 j값) * 단가q
             self.total_price.setText(f'''합계: {int(self.select_quantity.currentText()[:1]) *
                                               (int(self.price_per_unit.text()[4:-1]))}원''')
+        else:
+            self.total_price.setText('')
 
     def purchase_ingredient(self):
         if len(self.select_quantity.currentText()) != 0:
@@ -149,9 +151,8 @@ class BuyIngredient(QWidget):
             c = conn.cursor()
 
             # 재고 수량 = 재고 수량 + (구매 단위 * 선택 수량 맨 앞자리수)
-            c.execute(f'''UPDATE material_management 
-            SET inventory_quantity=inventory_quantity+(buy_unit*{int(self.select_quantity.currentText()[:1])}) 
-            WHERE material_name="{self.select_ingredient.currentText()}"''')
+            c.execute(f'''CALL purchase_ingredient({int(self.select_quantity.currentText()[:1])}, 
+            "{self.select_ingredient.currentText()}")''')
             conn.commit()
 
             c.close()
@@ -261,8 +262,7 @@ class ManageIngredient(QWidget):
                 buy_unit={self.select_bundle.currentData()}
                 WHERE material_name="{name}"'''
                 self.exe_db_smartstore(sql)
-                print(self.select_measurement.currentText())
-                print(type(self.select_measurement.currentText()))
+
                 sql = f'''UPDATE bill_of_material SET
                 measure_unit="{self.select_measurement.currentText()}"
                 WHERE material_name="{name}"'''
