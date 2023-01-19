@@ -261,7 +261,8 @@ class ManageIngredient(QWidget):
                 buy_unit={self.select_bundle.currentData()}
                 WHERE material_name="{name}"'''
                 self.exe_db_smartstore(sql)
-
+                print(self.select_measurement.currentText())
+                print(type(self.select_measurement.currentText()))
                 sql = f'''UPDATE bill_of_material SET
                 measure_unit="{self.select_measurement.currentText()}"
                 WHERE material_name="{name}"'''

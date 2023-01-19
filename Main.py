@@ -509,9 +509,7 @@ class MainPage(QWidget, MainUIset):
                 SELECT user_type FROM user_info 
                 WHERE store_name=FALSE
                 )''')
-                print(self.UserInfo)
                 not_ordered_customer = c.fetchall()
-                print(not_ordered_customer)
                 for menu_name in menu_db:
                     menu.append(menu_name[0])
 
