@@ -1,4 +1,7 @@
 import sys
+import threading
+import random
+import time
 
 import pymysql
 from PyQt5 import uic
@@ -40,8 +43,8 @@ class MainPage(QWidget, MainUIset):
         self.faq_management.clicked.connect(self.move_to_faq)
         self.ingredient_window = Ingredient()
         self.customer_service = ''
-
-
+        auto_faq = threading.Thread(target=self.make_auto_faq, daemon=True)
+        auto_faq.start()
 
     def Move_buylist(self):
         self.MAIN_STACK.setCurrentIndex(5)
@@ -478,9 +481,73 @@ class MainPage(QWidget, MainUIset):
 
         return faq_process_text
 
+    def make_auto_faq(self):
+        while True:
+            if self.LOGIN_signal == True:
+                time.sleep(15)
+                menu = []
+                conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', db='project7smartstore')
+                c = conn.cursor()
+
+                c.execute('SELECT product_name FROM product_info')
+                menu_db = c.fetchall()
+
+                c.execute('''SELECT DISTINCT c.user_idx, c.user_name, a.product_idx, a.product_name, a.order_idx
+                FROM order_management AS a
+                INNER JOIN faq_management AS b
+                INNER JOIN user_info AS c
+                ON a.customer_idx = c.user_idx
+                WHERE a.order_idx NOT IN (
+                SELECT order_idx
+                FROM faq_management
+                );''')
+                ordered_customer = c.fetchall()
+
+                c.execute('''SELECT * FROM user_info AS a 
+                JOIN product_info AS b 
+                WHERE a.user_type NOT IN(
+                SELECT user_type FROM user_info 
+                WHERE store_name=FALSE
+                )''')
+                print(self.UserInfo)
+                not_ordered_customer = c.fetchall()
+                print(not_ordered_customer)
+                for menu_name in menu_db:
+                    menu.append(menu_name[0])
+
+                odered_comment = ['맛있어요.', '맛없어요.', '너무 매워요.', '너무 달아요.', '너무 써요', '너무 많아요.', '너무 적어요.',
+                          '왜 팔아요?', '배달이 늦었어요.']
+                not_odered_comment = ['맛있나요?', '맵나요?', '양 많은가요?', '왜 팔아요?']
+                if random.randint(0, 1) == 1:
+                    if len(ordered_customer) > 5:
+                        if random.randint(0, 1) == 1:
+                            faq_content = f'{menu[random.randint(0, len(menu) - 1)]} ' \
+                                         f'{odered_comment[random.randint(0, len(odered_comment) - 1)]}'
+                            c.execute(f'''INSERT INTO faq_management
+                            (seller_idx, seller_name, buyer_idx, buyer_name, product_idx, product_name, order_idx, faq_content) 
+                            VALUES({self.UserInfo[0]}, '{self.UserInfo[3]}', {ordered_customer[0][0]}, '{ordered_customer[0][1]}', 
+                            {ordered_customer[0][2]}, '{ordered_customer[0][3]}', {ordered_customer[0][4]}, '{faq_content}')''')
+                            conn.commit()
+                            print(1)
+
+                    else:
+                        faq_content = f'{menu[random.randint(0, len(menu) - 1)]} ' \
+                                      f'{not_odered_comment[random.randint(0, len(not_odered_comment) - 1)]}'
+                        c.execute(f'''INSERT INTO faq_management
+                        (seller_idx, seller_name, buyer_idx, buyer_name, product_idx, product_name, faq_content) 
+                        VALUES({self.UserInfo[0]}, '{self.UserInfo[3]}', {not_ordered_customer[0][0]}, 
+                        '{not_ordered_customer[0][1]}', {not_ordered_customer[0][2]}, '{not_ordered_customer[0][3]}', 
+                        '{faq_content}')''')
+                        conn.commit()
+                        print(1)
+
+                c.close()
+                conn.close()
+
+                time.sleep(285)
+
     def faq_detail(self, store_faq_data):
-        table_row = self.faq_table.currentRow()
-        self.customer_service = CustomerService(store_faq_data[table_row])
+        self.customer_service = CustomerService(store_faq_data[self.faq_table.currentRow()])
         self.customer_service.show()
 
     def faq_to_bom(self):
