@@ -23,6 +23,7 @@ class Ingredient(QTabWidget):
         self.buy_ingredient.set_db()
         self.manage_ingredient.reset_select_name_item()
 
+
 class BuyIngredient(QWidget):
     def __init__(self):
         super().__init__()
@@ -300,6 +301,10 @@ class ManageIngredient(QWidget):
         self.set_select_name_item()
 
     def put_item_in_select_name(self, name_and_unit):
+        self.give_tooltip_to_new_item(name_and_unit)
+        self.append_star_to_new_ingredient(name_and_unit)
+
+    def give_tooltip_to_new_item(self, name_and_unit):
         new_item_tooltip = ''
 
         for item in name_and_unit:
@@ -307,12 +312,16 @@ class ManageIngredient(QWidget):
                 # 툴팁으로 등록하기 위해 텍스트 더함
                 new_item_tooltip += f'{item[0]} '
 
+        self.select_name.setToolTip(f'{new_item_tooltip}등록 필요')
+
+    def append_star_to_new_ingredient(self, name_and_unit):
+        for item in name_and_unit:
+            if item[1] == 0:
                 # 등록 필요한 신규 아이템 구별을 위한 *표
                 self.select_name.addItem(f'{item[0]}*')
 
             else:
                 self.select_name.addItem(f'{item[0]}')
-        self.select_name.setToolTip(f'{new_item_tooltip}등록 필요')
 
     @staticmethod
     def exe_db_smartstore(sql):
