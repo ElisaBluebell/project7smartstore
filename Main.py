@@ -57,12 +57,15 @@ class MainPage(QWidget, MainUIset):
         auto_faq = threading.Thread(target=self.make_auto_faq, daemon=True)
         auto_faq.start()
         self.tete.clicked.connect(self.auto_ordering)
-
+    # 자동주문 스레드 생성 메서드
+    # auto_order 스레드를 생성하고 시작하는 메서드
+    # 버튼클릭 시그널에 연결시킴. (로그인시 바로 동작해도 됨.)
     def auto_ordering(self):
         auto_order = Thread(target=self.thread_ordering, args=())
         auto_order.daemon = True
         auto_order.start()
-
+    # 자동주문 스레드 메서드
+    # 랜덤을 통해 판매중인 제품중에 재고에 맞춰 랜덤하게 주문하도록 구성.
     def thread_ordering(self):
         while 1:
             print('구매중')
@@ -95,7 +98,8 @@ class MainPage(QWidget, MainUIset):
                 db.commit()
                 db.close()
             time.sleep(5)
-
+    # 주문확인 메서드
+    # 판매자가 주문이 들어온 후 주문확인을 통해 구매자가 상태를 확인할 수 있게 함. (주문확인중 -> 주문확인완료)
     def order_accept(self):
         select = self.MAIN_selllist.selectedItems()
         print("길이", len(select))
@@ -109,6 +113,7 @@ class MainPage(QWidget, MainUIset):
         msg = QMessageBox.information(self, "알림", "주문확인")
         self.Move_selllist()
 
+    # 판매자의 판매리스트 메서드 어떤 상품이 팔렸는지 확인 하는 기능
     def Move_selllist(self):
         self.MAIN_STACK.setCurrentIndex(6)
 
@@ -133,6 +138,7 @@ class MainPage(QWidget, MainUIset):
             self.MAIN_selllist.setItem(i, 4, QTableWidgetItem(str(Blist[i][5])))
             self.MAIN_selllist.setItem(i, 5, QTableWidgetItem(str(Blist[i][5] * Blist[i][9])))
 
+    # 구매자의 구매리스트 메서드
     def Move_buylist(self):
         self.MAIN_STACK.setCurrentIndex(7)
         db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
@@ -157,13 +163,14 @@ class MainPage(QWidget, MainUIset):
                 self.MAIN_buylist.setItem(i, 4, QTableWidgetItem('주문확인중'))
             else:
                 self.MAIN_buylist.setItem(i, 4, QTableWidgetItem('주문확인완료'))
-
+    # 상품판매 알림 스레드 생성 메서드
     def test_th(self):
         self.th_siganl = True
         thread_order = Thread(target=self.thread_act, args=())
         thread_order.daemon = True
         thread_order.start()
-
+    # 상품판매 스레드 메서드
+    # 판매자가 확인하지 않은 주문건 수를 실시간으로 알려주는 기능.
     def thread_act(self):
         bt = [self.BT_alert, self.BT_alert2, self.BT_alert3]
         if self.LOGIN_signal == True:
@@ -201,6 +208,8 @@ class MainPage(QWidget, MainUIset):
                         temp.setText(" ")
                     time.sleep(2)
 
+    # 상품 구매 메서드
+    # 상품구매에 성공(조건 충족)하면 order 테이블에 데이터 insert 하는 기능.
     def Check_order(self):
         try:
             db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
@@ -232,9 +241,12 @@ class MainPage(QWidget, MainUIset):
             msg = QMessageBox.information(self, "알림", "수량을 입력해주세요")
             return
 
+
     def move_main(self):
         self.MAIN_STACK.setCurrentIndex(0)
 
+    # 상품 선택 메서드
+    # 제품 선택시 해당 제품에 대한 설명과 구매 정보 입력창이 출력 되는 기능.
     def check_selllist(self, signal):
         if signal == 0:
             if self.MAIN_sellList.item(self.MAIN_sellList.currentRow(), 3).text() == "구매불가":
@@ -253,6 +265,9 @@ class MainPage(QWidget, MainUIset):
                 self.lb_totalPrice.setText(" ")
                 self.lb_totalPrice2.hide()
 
+    # 메인에서 판매리스트로 이동
+    # 판매 등록된 상품을 테이블위젯에 추가시키는 메서드
+    # 재고와 연동해서 현재 보유중인 재고로 각 상품에 대해서 몇개를 구매 할 수 있는지 표현함. (여러종류를 한번에 구매는 못함)
     def Move_SellList(self):
         self.MAIN_STACK.setCurrentIndex(3)
         self.le_sellnum.clear()
@@ -280,6 +295,9 @@ class MainPage(QWidget, MainUIset):
             self.MAIN_sellList.setItem(i, 3, QTableWidgetItem(str(sellnum)))
         self.frame.hide()
 
+    # 버튼 세팅 메서드
+    # 프레임을 만들어서 판매자용 구매자용 버튼을 따로 지정해서 판매자로 로그인시 판매자용 버튼만 보이게,
+    # 구매자로 로그인시 구매자용 버튼만 보이게 하는 기능.
     def BT_setting(self):
         if self.LOGIN_signal == False:
             self.frame_buyer.hide()
@@ -293,6 +311,8 @@ class MainPage(QWidget, MainUIset):
             else:
                 self.frame_buyer.show()
 
+    # 로그인 페이지 이동 메서드
+    # 버튼 클릭으로 연결해서 비로그인시엔 로그인창이 로그인시엔 로그아웃이 되도록 설정됨.
     def Move_LoginPage(self):
         if self.LOGIN_signal:
             # 로그아웃시 초기화
@@ -306,6 +326,8 @@ class MainPage(QWidget, MainUIset):
         else:
             self.PAGE_Login = LoginPage(self)
 
+    # 페이지 이동시 이전 페이지의 데이터를 초기화 하는 메서드
+    # 처음에는 다 설정 해 놓았다가 조금씩 코드 수정하면서 한 가지 경우로만 사용됨.
     def Move_reset(self, signal):
         if signal == 0:
             self.MAIN_STACK.setCurrentIndex(0)
@@ -314,6 +336,8 @@ class MainPage(QWidget, MainUIset):
             self.MAIN_strorelist.clearContents()
             self.MAIN_strorelist.setRowCount(0)
 
+
+    # 판매상품 등록 페이지 이동 메서드
     def Move_test(self):
         self.MAIN_STACK.setCurrentIndex(2)
 
@@ -327,7 +351,8 @@ class MainPage(QWidget, MainUIset):
         header.resizeSection(2, 50)
         self.rowplus(1)
 
-    # 동적 행 추가
+    # 판매상품 등록 페이지에서 +- 클릭이 동작하는 메서드
+    # 테이블위젯의 행을 1개씩 추가하거나 제거하는 기능.
     def rowplus(self, signal):
         if signal == 1:
             self.combobox = QComboBox()
@@ -343,6 +368,8 @@ class MainPage(QWidget, MainUIset):
                 return
             self.MAIN_strorelist.removeRow(self.MAIN_strorelist.rowCount() - 1)
 
+    # 상품등록 메서드
+    # 상품등록 확인 했을때 입력된 데이터들을 체크한 후 db에 insert 하는 기능.
     def datacheck(self):
         for i in range(self.MAIN_strorelist.rowCount()):
             for j in range(self.MAIN_strorelist.columnCount() - 1):
@@ -390,7 +417,7 @@ class MainPage(QWidget, MainUIset):
                 cursor.execute("SELECT * FROM project7smartstore.product_info "
                                f"WHERE product_name='{self.MAIN_LE_productName.text()}' and store_name='{self.UserInfo[5]}'")
                 temp2 = cursor.fetchall()
-                if check == 0:
+                if check == 0:  # BoM_insert 프리시저 사용
                     cursor.execute(f"call project7smartstore.BoM_insert('PJ{str(temp).zfill(4)}',"
                                    f"'{self.MAIN_strorelist.item(i, 0).text()}',"
                                    f"'{self.MAIN_strorelist.item(i, 1).text()}',"
