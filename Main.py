@@ -419,8 +419,8 @@ class MainPage(QWidget, MainUIset):
 
     def set_material_db(self):
         sql = 'SELECT * FROM bill_of_material;'
-        self.material_db = self.exe_db_smartstore(sql)
         # 0 = BoM idx, 1 = 재료 idx, 2 = 재료명, 3 = 재료 소모량, 4 = 계량 단위, 5 = 상품(사용처) idx, 6 = 상품명
+        self.material_db = self.exe_db_smartstore(sql)
 
     def set_bill_of_material_ui(self):
         self.set_material_db()
@@ -439,7 +439,7 @@ class MainPage(QWidget, MainUIset):
 
     def define_bom_combo_item(self):
         self.bom_select_menu.clear()
-        # 기본값 전체 설정
+        # 기본 값으로 '전체' 설정
         self.bom_select_menu.addItem('전체')
         self.fill_menu_list()
 
@@ -455,14 +455,21 @@ class MainPage(QWidget, MainUIset):
                 self.bom_select_menu.addItem(item)
 
     def set_bom_table(self):
+        # 버티컬 헤더 가림
         self.bom_ingredient_table.verticalHeader().setVisible(False)
         self.bom_ingredient_table.setColumnWidth(0, 72)
         self.bom_ingredient_table.setColumnWidth(1, 60)
         self.bom_ingredient_table.setColumnWidth(2, 240)
 
         self.get_bom_table_db()
+        # 현재 메뉴 콤보박스에 선택된 메뉴가 있을 시 menu_changed 함수 연결
         if len(self.bom_select_menu.currentText()) > 0:
             self.bom_select_menu.currentTextChanged.connect(self.menu_changed)
+
+    def menu_changed(self):
+        self.default_bom_table_and_label()
+        self.set_bom_table_logic()
+        self.set_bom_available()
 
     def get_bom_table_db(self):
         sql = 'CALL group_product_by_material();'
@@ -478,15 +485,12 @@ class MainPage(QWidget, MainUIset):
             for j in range(len(self.table_data[i])):
                 self.set_bom_table_data_tooltip(i, j, i, j)
 
+    # 툴팁과 데이터를 주어진 인수에 따라 채움
     def set_bom_table_data_tooltip(self, row, column, i, j):
         self.bom_ingredient_table.setItem(row, column, QTableWidgetItem(self.table_data[i][j]))
         self.bom_ingredient_table.item(row, column).setToolTip(self.table_data[i][j])
 
-    def menu_changed(self):
-        self.default_bom_table_and_label()
-        self.set_bom_table_logic()
-        self.set_bom_available()
-
+    # 테이블 기본 설정
     def default_bom_table_and_label(self):
         if self.bom_select_menu.currentText() == '전체':
             self.loop_put_all_data_in()
@@ -522,12 +526,14 @@ class MainPage(QWidget, MainUIset):
                 self.set_bom_available_text(producible)
 
     def change_bom_available_text_color(self, producible):
+        # 10개 미만 제작 가능한 경우 제작 가능 표시 라벨 색을 붉게
         if producible < 10:
             self.bom_available.setStyleSheet("Color: red")
         else:
             self.bom_available.setStyleSheet("Color: black")
 
     def set_bom_available_text(self, producible):
+        # 색칠 및 출력
         self.change_bom_available_text_color(producible)
         self.bom_available.setText(f'{str(producible)}개 제작 가능')
 
@@ -578,6 +584,7 @@ class MainPage(QWidget, MainUIset):
 
     def check_store_match_faq(self, faq_data):
         store_faq = []
+        # 유저 정보와 일치하는 문의사항 선별
         for i in range(len(faq_data)):
             if self.UserInfo[0] == faq_data[i][1]:
                 store_faq.append(faq_data[i])
@@ -627,9 +634,11 @@ class MainPage(QWidget, MainUIset):
 
     def make_auto_faq(self):
         while True:
+            # 로그인 시그널 참일 시 댓글 생성됨
             if self.LOGIN_signal:
-                time.sleep(15)
+                time.sleep(150)
                 menu = []
+                # 쿼리문을 돌리기 위한 데이터 세팅
                 faq_db = self.get_faq_db()
                 comment = self.comment()
 
@@ -637,15 +646,20 @@ class MainPage(QWidget, MainUIset):
                     menu.append(menu_name[0])
 
                 if random.randint(0, 1) == 1 and len(faq_db[1]) > 5:
+                    # 메뉴명+코멘트로 랜덤 코멘트 작성
                     faq_content = f'{menu[random.randint(0, len(menu) - 1)]} ' \
                                   f'{comment[0][random.randint(0, len(comment[0]) - 1)]}'
 
+                    # 각각의 칼럼에 맞는 매개변수를 가지고 코멘트 DB를 업데이트 하는 쿼리문 실행
                     sql = f'''CALL comment_of_ordered_customer({self.UserInfo[0]}, "{self.UserInfo[3]}", 
-                    {faq_db[1][0][0]}, "{faq_db[1][0][1]}", {faq_db[1][0][2]}, 
-                    "{faq_db[1][0][3]}", {faq_db[1][0][4]}, "{faq_content}")'''
+                    {faq_db[1][random.randrange(len(faq_db[1]))][0]}, 
+                    "{faq_db[1][random.randrange(len(faq_db[1]))][1]}", 
+                    {faq_db[1][random.randrange(len(faq_db[1]))][2]}, 
+                    "{faq_db[1][random.randrange(len(faq_db[1]))][3]}", 
+                    {faq_db[1][random.randrange(len(faq_db[1]))][4]}, "{faq_content}")'''
                     self.exe_db_smartstore(sql)
 
-                time.sleep(285)
+                time.sleep(150)
 
     def faq_detail(self, store_faq_data):
         self.customer_service = CustomerService(store_faq_data[self.faq_table.currentRow()])
@@ -668,6 +682,7 @@ class MainPage(QWidget, MainUIset):
         conn.close()
 
         return loaded
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
