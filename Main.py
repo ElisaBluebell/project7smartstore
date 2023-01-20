@@ -441,6 +441,9 @@ class MainPage(QWidget, MainUIset):
         self.bom_select_menu.clear()
         # 기본값 전체 설정
         self.bom_select_menu.addItem('전체')
+        self.fill_menu_list()
+
+    def fill_menu_list(self):
         menu = []
         # DB상 상품명을 중복되지 않게 메뉴 리스트에 삽입
         for item in self.material_db:
@@ -610,40 +613,36 @@ class MainPage(QWidget, MainUIset):
         not_odered_comment = ['맛있나요?', '맵나요?', '양 많은가요?', '왜 팔아요?']
         return odered_comment, not_odered_comment
 
+    def get_faq_db(self):
+        sql = 'SELECT product_name FROM product_info;'
+        menu_db = self.exe_db_smartstore(sql)
+
+        sql = 'CALL get_ordered_customer_db;'
+        ordered_customer = self.exe_db_smartstore(sql)
+
+        sql = 'CALL get_non_ordered_customer_db;'
+        not_ordered_customer = self.exe_db_smartstore(sql)
+
+        return menu_db, ordered_customer, not_ordered_customer
+
     def make_auto_faq(self):
         while True:
             if self.LOGIN_signal:
                 time.sleep(15)
                 menu = []
+                faq_db = self.get_faq_db()
+                comment = self.comment()
 
-                sql = 'SELECT product_name FROM product_info;'
-                menu_db = self.exe_db_smartstore(sql)
-
-                sql = 'CALL get_ordered_customer_db;'
-                ordered_customer = self.exe_db_smartstore(sql)
-
-                sql = 'CALL get_non_ordered_customer_db;'
-                not_ordered_customer = self.exe_db_smartstore(sql)
-
-                for menu_name in menu_db:
+                for menu_name in faq_db[0]:
                     menu.append(menu_name[0])
 
-                if random.randint(0, 1) == 1 and len(ordered_customer) > 5:
+                if random.randint(0, 1) == 1 and len(faq_db[1]) > 5:
                     faq_content = f'{menu[random.randint(0, len(menu) - 1)]} ' \
-                                  f'{self.comment()[0][random.randint(0, len(self.comment()[0]) - 1)]}'
+                                  f'{comment[0][random.randint(0, len(comment[0]) - 1)]}'
 
                     sql = f'''CALL comment_of_ordered_customer({self.UserInfo[0]}, "{self.UserInfo[3]}", 
-                    {ordered_customer[0][0]}, "{ordered_customer[0][1]}", {ordered_customer[0][2]}, 
-                    "{ordered_customer[0][3]}", {ordered_customer[0][4]}, "{faq_content}")'''
-                    self.exe_db_smartstore(sql)
-
-                else:
-                    faq_content = f'{menu[random.randint(0, len(menu) - 1)]} ' \
-                                  f'{self.comment()[1][random.randint(0, len(self.comment()[1]) - 1)]}'
-
-                    sql = f'''CALL comment_of_non_ordered_customer({self.UserInfo[0]}, "{self.UserInfo[3]}", 
-                    {not_ordered_customer[0][0]}, "{not_ordered_customer[0][1]}", {not_ordered_customer[0][2]}, 
-                    "{not_ordered_customer[0][3]}", "{faq_content}")'''
+                    {faq_db[1][0][0]}, "{faq_db[1][0][1]}", {faq_db[1][0][2]}, 
+                    "{faq_db[1][0][3]}", {faq_db[1][0][4]}, "{faq_content}")'''
                     self.exe_db_smartstore(sql)
 
                 time.sleep(285)
