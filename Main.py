@@ -415,19 +415,14 @@ class MainPage(QWidget, MainUIset):
         db.commit()
         db.close()
 
+# ===================================================== 재료 관리 =====================================================
+
     def set_material_db(self):
-        conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
-                               db='project7smartstore')
-        c = conn.cursor()
-
-        c.execute('SELECT * FROM `project7smartstore`.`bill_of_material`')
+        sql = 'SELECT * FROM bill_of_material;'
+        self.material_db = self.exe_db_smartstore(sql)
         # 0 = BoM idx, 1 = 재료 idx, 2 = 재료명, 3 = 재료 소모량, 4 = 계량 단위, 5 = 상품(사용처) idx, 6 = 상품명
-        self.material_db = c.fetchall()
 
-        c.close()
-        conn.close()
-
-    def move_to_bill_of_material(self):
+    def set_bill_of_material_ui(self):
         self.set_material_db()
         # User_Info 0 = 유저 idx, 1 = 유저 id, 2 = 유저 pw, 3 = 유저명, 4 = 전화번호, 5 = 상호명, 6 = 유저 분류
         self.bom_store_name.setText(self.UserInfo[5])
@@ -438,6 +433,8 @@ class MainPage(QWidget, MainUIset):
         self.define_bom_combo_item()
         self.set_bom_table()
 
+    def move_to_bill_of_material(self):
+        self.set_bill_of_material_ui()
         self.MAIN_STACK.setCurrentIndex(1)
 
     def define_bom_combo_item(self):
@@ -465,22 +462,13 @@ class MainPage(QWidget, MainUIset):
             self.bom_select_menu.currentTextChanged.connect(self.menu_changed)
 
     def get_bom_table_db(self):
+        sql = 'CALL group_product_by_material();'
+        # 0 = 재료명(명칭과 계량 단위가 겹치지 않음), 1 = 보유 수량, 2 = 사용처 그룹
+        self.table_data = self.exe_db_smartstore(sql)
+        self.loop_put_all_data_in()
 
-        conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
-                               db='project7smartstore')
-        c = conn.cursor()
-
-        c.execute('call project7smartstore.group_product_by_material();')
-
-        # 프로시저 호출을 통해 받아온 DB값, 0 = 재료명(명칭과 계량 단위가 겹치지 않음), 1 = 보유 수량, 2 = 사용처 그룹
-        self.table_data = c.fetchall()
-        self.bom_table_default_data()
-
-        c.close()
-        conn.close()
-
-    def bom_table_default_data(self):
-        # 프로시저를 통해 받아온 DB의 요소 수만큼 반복함
+    def loop_put_all_data_in(self):
+        # 툴팁과 데이터를 테이블에 삽입하기 위해 행 설정 및 반복문 실행
         self.bom_ingredient_table.setRowCount(len(self.table_data))
 
         for i in range(len(self.table_data)):
@@ -492,53 +480,53 @@ class MainPage(QWidget, MainUIset):
         self.bom_ingredient_table.item(row, column).setToolTip(self.table_data[i][j])
 
     def menu_changed(self):
+        self.default_bom_table_and_label()
         self.set_bom_table_logic()
         self.set_bom_available()
 
-    def set_bom_table_logic(self):
+    def default_bom_table_and_label(self):
         if self.bom_select_menu.currentText() == '전체':
-            self.bom_table_default_data()
-
-        else:
-            if len(self.bom_select_menu.currentText()) > 0:
-                # bom_table_row, bom_table_column은 set_bom_table_data_tooltip 함수에서 각각 row, column으로 사용함
-                # 반복문에서의 i, j값과 별개로 데이터 축적시마다 1개씩 증가해 올바른 표의 행과 열에 들어감
-                bom_table_row = 0
-                self.bom_ingredient_table.setRowCount(bom_table_row)
-
-                for i in range(len(self.table_data)):
-                    # self.table_data =
-                    # [material_name, material_quantity+measure_unit, product_name GROUP BY material_name]
-                    if self.bom_select_menu.currentText() in self.table_data[i][2]:
-                        bom_table_row += 1
-                        bom_table_column = 0
-                        self.bom_ingredient_table.setRowCount(bom_table_row)
-
-                        for j in range(len(self.table_data[i])):
-                            self.set_bom_table_data_tooltip(bom_table_row - 1, bom_table_column, i, j)
-                            bom_table_column += 1
-
-    def set_bom_available(self):
-        if self.bom_select_menu.currentText() == '전체':
+            self.loop_put_all_data_in()
             self.bom_available.setText('')
 
-        else:
+    def set_bom_table_logic(self):
+        # bom_table_row, bom_table_column은 set_bom_table_data_tooltip 함수에서 각각 row, column으로 사용함
+        # 반복문에서의 i, j값과 별개로 데이터 축적시마다 1개씩 증가해 올바른 표의 행과 열에 삽입
+        if self.bom_select_menu.currentText() != '전체' and len(self.bom_select_menu.currentText()) > 0:
+
+            bom_table_row = 0
+            self.bom_ingredient_table.setRowCount(bom_table_row)
+
+            for i in range(len(self.table_data)):
+                if self.bom_select_menu.currentText() in self.table_data[i][2]:
+                    bom_table_row += 1
+                    bom_table_column = 0
+
+                    self.bom_ingredient_table.setRowCount(bom_table_row)
+
+                    for j in range(len(self.table_data[i])):
+                        self.set_bom_table_data_tooltip(bom_table_row - 1, bom_table_column, i, j)
+                        bom_table_column += 1
+
+    def set_bom_available(self):
+        if self.bom_select_menu.currentText() != '전체':
             if len(self.bom_select_menu.currentText()) > 0:
-                conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
-                                       db='project7smartstore')
-                c = conn.cursor()
 
                 # 콤보박스에서 선택된 메뉴의 재료들 중 가장 작은 재료재고/재료소모량 값을 가져옴
-                c.execute(f'''CALL get_minimun_ingredient_left("{self.bom_select_menu.currentText()}")''')
-                producible = c.fetchall()[0][0]
+                sql = f'CALL get_minimun_ingredient_left("{self.bom_select_menu.currentText()}");'
+                producible = self.exe_db_smartstore(sql)[0][0]
 
-                if producible < 10:
-                    self.bom_available.setStyleSheet("Color: red")
+                self.set_bom_available_text(producible)
 
-                else:
-                    self.bom_available.setStyleSheet("Color: black")
+    def change_bom_available_text_color(self, producible):
+        if producible < 10:
+            self.bom_available.setStyleSheet("Color: red")
+        else:
+            self.bom_available.setStyleSheet("Color: black")
 
-                self.bom_available.setText(f'{str(producible)}개 제작 가능')
+    def set_bom_available_text(self, producible):
+        self.change_bom_available_text_color(producible)
+        self.bom_available.setText(f'{str(producible)}개 제작 가능')
 
     def buy_ingredient_window(self):
         self.ingredient_window.reset_items()
@@ -546,6 +534,8 @@ class MainPage(QWidget, MainUIset):
 
     def bom_to_main(self):
         self.MAIN_STACK.setCurrentIndex(0)
+
+# ===================================================== 문의 관리 =====================================================
 
     def move_to_faq(self):
         self.set_faq_page()
@@ -614,49 +604,47 @@ class MainPage(QWidget, MainUIset):
 
         return faq_process_text
 
+    def comment(self):
+        odered_comment = ['맛있어요.', '맛없어요.', '너무 매워요.', '너무 달아요.', '너무 써요', '너무 많아요.',
+                          '너무 적어요.', '왜 팔아요?', '배달이 늦었어요.']
+        not_odered_comment = ['맛있나요?', '맵나요?', '양 많은가요?', '왜 팔아요?']
+        return odered_comment, not_odered_comment
+
     def make_auto_faq(self):
         while True:
             if self.LOGIN_signal:
                 time.sleep(15)
                 menu = []
-                conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
-                                       db='project7smartstore')
-                c = conn.cursor()
 
-                c.execute('SELECT product_name FROM product_info')
-                menu_db = c.fetchall()
+                sql = 'SELECT product_name FROM product_info;'
+                menu_db = self.exe_db_smartstore(sql)
 
-                c.execute('''CALL get_ordered_customer_db;''')
-                ordered_customer = c.fetchall()
+                sql = 'CALL get_ordered_customer_db;'
+                ordered_customer = self.exe_db_smartstore(sql)
 
-                c.execute('''CALL get_non_ordered_customer_db;''')
-                not_ordered_customer = c.fetchall()
+                sql = 'CALL get_non_ordered_customer_db;'
+                not_ordered_customer = self.exe_db_smartstore(sql)
+
                 for menu_name in menu_db:
                     menu.append(menu_name[0])
 
-                odered_comment = ['맛있어요.', '맛없어요.', '너무 매워요.', '너무 달아요.', '너무 써요', '너무 많아요.', '너무 적어요.', '왜 팔아요?',
-                                  '배달이 늦었어요.']
-                not_odered_comment = ['맛있나요?', '맵나요?', '양 많은가요?', '왜 팔아요?']
-                if random.randint(0, 1) == 1:
-                    if len(ordered_customer) > 5:
-                        if random.randint(0, 1) == 1:
-                            faq_content = f'{menu[random.randint(0, len(menu) - 1)]} ' \
-                                          f'{odered_comment[random.randint(0, len(odered_comment) - 1)]}'
-                            c.execute(f'''CALL comment_of_ordered_customer({self.UserInfo[0]}, "{self.UserInfo[3]}", 
-                            {ordered_customer[0][0]}, "{ordered_customer[0][1]}", {ordered_customer[0][2]}, 
-                            "{ordered_customer[0][3]}", {ordered_customer[0][4]}, "{faq_content}")''')
-                            conn.commit()
+                if random.randint(0, 1) == 1 and len(ordered_customer) > 5:
+                    faq_content = f'{menu[random.randint(0, len(menu) - 1)]} ' \
+                                  f'{self.comment()[0][random.randint(0, len(self.comment()[0]) - 1)]}'
 
-                    else:
-                        faq_content = f'{menu[random.randint(0, len(menu) - 1)]} ' \
-                                      f'{not_odered_comment[random.randint(0, len(not_odered_comment) - 1)]}'
-                        c.execute(f'''CALL comment_of_non_ordered_customer({self.UserInfo[0]}, "{self.UserInfo[3]}", 
-                        {not_ordered_customer[0][0]}, "{not_ordered_customer[0][1]}", {not_ordered_customer[0][2]}, 
-                        "{not_ordered_customer[0][3]}", "{faq_content}")''')
-                        conn.commit()
+                    sql = f'''CALL comment_of_ordered_customer({self.UserInfo[0]}, "{self.UserInfo[3]}", 
+                    {ordered_customer[0][0]}, "{ordered_customer[0][1]}", {ordered_customer[0][2]}, 
+                    "{ordered_customer[0][3]}", {ordered_customer[0][4]}, "{faq_content}")'''
+                    self.exe_db_smartstore(sql)
 
-                c.close()
-                conn.close()
+                else:
+                    faq_content = f'{menu[random.randint(0, len(menu) - 1)]} ' \
+                                  f'{self.comment()[1][random.randint(0, len(self.comment()[1]) - 1)]}'
+
+                    sql = f'''CALL comment_of_non_ordered_customer({self.UserInfo[0]}, "{self.UserInfo[3]}", 
+                    {not_ordered_customer[0][0]}, "{not_ordered_customer[0][1]}", {not_ordered_customer[0][2]}, 
+                    "{not_ordered_customer[0][3]}", "{faq_content}")'''
+                    self.exe_db_smartstore(sql)
 
                 time.sleep(285)
 
@@ -667,6 +655,20 @@ class MainPage(QWidget, MainUIset):
     def faq_to_bom(self):
         self.MAIN_STACK.setCurrentIndex(1)
 
+    @staticmethod
+    def exe_db_smartstore(sql):
+        conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
+                               db='project7smartstore')
+        c = conn.cursor()
+
+        c.execute(sql)
+        conn.commit()
+        loaded = c.fetchall()
+
+        c.close()
+        conn.close()
+
+        return loaded
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
