@@ -475,7 +475,7 @@ class MainPage(QWidget, MainUIset):
         sql = 'CALL group_product_by_material();'
         # 0 = 재료명(명칭과 계량 단위가 겹치지 않음), 1 = 보유 수량, 2 = 사용처 그룹
         self.table_data = self.exe_db_smartstore(sql)
-        self.loop_put_all_data_in()
+        # self.loop_put_all_data_in()
 
     def loop_put_all_data_in(self):
         # 툴팁과 데이터를 테이블에 삽입하기 위해 행 설정 및 반복문 실행
@@ -559,7 +559,7 @@ class MainPage(QWidget, MainUIset):
         faq_data = self.get_faq_data()
         store_faq_data = self.check_store_match_faq(faq_data)
         self.set_faq_table_rowcount(store_faq_data)
-        self.faq_data_putin_table(store_faq_data)
+        self.put_faq_data_in_table(store_faq_data)
         self.faq_table.clicked.connect(lambda: self.faq_detail(store_faq_data))
 
     def set_faq_btn(self):
@@ -594,7 +594,7 @@ class MainPage(QWidget, MainUIset):
     def set_faq_table_rowcount(self, store_faq_data):
         self.faq_table.setRowCount(len(store_faq_data))
 
-    def faq_data_putin_table(self, store_faq_data):
+    def put_faq_data_in_table(self, store_faq_data):
         for i in range(len(store_faq_data)):
             self.faq_table.setItem(i, 0, QTableWidgetItem(store_faq_data[i][4]))
             self.faq_table.setItem(i, 1, QTableWidgetItem(str(store_faq_data[i][7])))
