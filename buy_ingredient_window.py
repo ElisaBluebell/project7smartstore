@@ -23,6 +23,7 @@ class Ingredient(QTabWidget):
         self.buy_ingredient.set_db()
         self.manage_ingredient.reset_select_name_item()
 
+
 class BuyIngredient(QWidget):
     def __init__(self):
         super().__init__()
@@ -84,16 +85,8 @@ class BuyIngredient(QWidget):
                                db='project7smartstore')
         c = conn.cursor()
 
-        c.execute('''SELECT DISTINCT a.material_name, 
-        a.buy_unit, 
-        a.material_price, 
-        a.inventory_quantity, 
-        b.measure_unit 
-        FROM material_management AS a 
-        INNER JOIN bill_of_material AS b 
-        ON a.material_name=b.material_name''')
-
-        # 0 = 재료명, 1 = 재료구매단위, 2 = 재료가격, 3 = 재료재고, 4 = 계량단위
+        # 0재료명 1구매단위 2단위가격 3재고수량 4계량단위
+        c.execute('''CALL get_ingredient_db()''')
         self.ingredient_list = c.fetchall()
 
         c.close()
@@ -255,17 +248,10 @@ class ManageIngredient(QWidget):
     def modify_ingredient(self):
         try:
             if type(int(self.input_price.text())) == int:
-                name = self.check_new_name()
+                name = self.check_if_new_name()
 
-                sql = f'''UPDATE material_management SET  
-                material_price={int(self.input_price.text())}, 
-                buy_unit={self.select_bundle.currentData()}
-                WHERE material_name="{name}"'''
-                self.exe_db_smartstore(sql)
-
-                sql = f'''UPDATE bill_of_material SET
-                measure_unit="{self.select_measurement.currentText()}"
-                WHERE material_name="{name}"'''
+                sql = f'''CALL modify_ingredient_data({int(self.input_price.text())}, {self.select_bundle.currentData()}
+                , "{self.select_measurement.currentText()}", "{name}")'''
                 self.exe_db_smartstore(sql)
 
                 QMessageBox.information(self, '수정', '수정되었습니다.')
@@ -274,21 +260,7 @@ class ManageIngredient(QWidget):
         except ValueError:
             QMessageBox.warning(self, '입력 오류', '가격은 숫자로 입력해주세요.')
 
-    def delete_ingredient(self):
-        name = self.check_new_name()
-
-        sql = f'''DELETE FROM material_management 
-        WHERE material_name="{name}"'''
-        self.exe_db_smartstore(sql)
-
-        sql = f'''DELETE FROM bill_of_material 
-        WHERE material_name="{name}"'''
-        self.exe_db_smartstore(sql)
-
-        QMessageBox.information(self, '삭제', '삭제되었습니다.')
-        self.reset_select_name_item()
-
-    def check_new_name(self):
+    def check_if_new_name(self):
         if '*' in self.select_name.currentText():
             name = self.select_name.currentText()[:-1]
         else:
@@ -300,6 +272,10 @@ class ManageIngredient(QWidget):
         self.set_select_name_item()
 
     def put_item_in_select_name(self, name_and_unit):
+        self.give_tooltip_to_new_item(name_and_unit)
+        self.append_star_to_new_ingredient(name_and_unit)
+
+    def give_tooltip_to_new_item(self, name_and_unit):
         new_item_tooltip = ''
 
         for item in name_and_unit:
@@ -307,12 +283,16 @@ class ManageIngredient(QWidget):
                 # 툴팁으로 등록하기 위해 텍스트 더함
                 new_item_tooltip += f'{item[0]} '
 
+        self.select_name.setToolTip(f'{new_item_tooltip}등록 필요')
+
+    def append_star_to_new_ingredient(self, name_and_unit):
+        for item in name_and_unit:
+            if item[1] == 0:
                 # 등록 필요한 신규 아이템 구별을 위한 *표
                 self.select_name.addItem(f'{item[0]}*')
 
             else:
                 self.select_name.addItem(f'{item[0]}')
-        self.select_name.setToolTip(f'{new_item_tooltip}등록 필요')
 
     @staticmethod
     def exe_db_smartstore(sql):

@@ -66,13 +66,8 @@ class CustomerService(QWidget):
         self.store_cs_content.setMaxLength(40)
 
     def register_cs_answer(self):
-        sql = f'''UPDATE faq_management 
-        SET faq_process=2, 
-        answer="{self.store_cs_content.text()}" 
-        WHERE faq_idx={self.faq_db[0]}'''
-
+        sql = f'''CALL reply_faq("{self.store_cs_content.text()}", {self.faq_db[0]})'''
         self.exe_db_smartstore(sql)
-
         QMessageBox.information(self, '답변 등록 완료', '답변이 등록되었습니다.')
 
     def change_faq_status_read(self):

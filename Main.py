@@ -28,6 +28,7 @@ class MainPage(QWidget, MainUIset):
         self.UserInfo = []
         self.material_db = ''
         self.table_data = []
+        self.combobox = QComboBox()
         self.MAIN_BT_loginout.clicked.connect(self.Move_LoginPage)
         self.MAIN_BT_seller_insert.clicked.connect(self.Move_test)
         self.MAIN_BT_plus.clicked.connect(lambda: self.rowplus(1))
@@ -223,7 +224,7 @@ class MainPage(QWidget, MainUIset):
             cursor.execute(f'call project7smartstore.material_num_check("{self.lb_productname2.text()}")')
             num = cursor.fetchone()[0]
             if num < int(self.le_sellnum.text()):
-                msg = QMessageBox.information(self, "알림", "구매 수량을 확인해주세요")
+                QMessageBox.information(self, "알림", "구매 수량을 확인해주세요")
                 return
             cursor.execute("INSERT INTO project7smartstore.order_management "
                            f"(order_date,product_idx,product_name,product_quantity,customer_idx,seller_idx,store_name) "
@@ -231,11 +232,11 @@ class MainPage(QWidget, MainUIset):
                            f"'{self.le_sellnum.text()}','{self.UserInfo[0]}','{a[0][0]}','{a[0][9]}')")
             db.commit()
             db.close()
-            msg = QMessageBox.information(self, "알림", "주문완료")
+            QMessageBox.information(self, "알림", "주문완료")
             self.le_sellnum.clear()
             self.Move_SellList()
         except pymysql.err.DataError:
-            msg = QMessageBox.information(self, "알림", "정보를 입력해주세요")
+            QMessageBox.information(self, "알림", "정보를 입력해주세요")
             return
         except ValueError:
             msg = QMessageBox.information(self, "알림", "수량을 입력해주세요")
@@ -290,7 +291,7 @@ class MainPage(QWidget, MainUIset):
             # 재고확인해서 만들 수 있는 갯수 체크
             c.execute(f'call material_num_check("{str(sellList[i][8])}")')
             sellnum = c.fetchall()[0][0]
-            if sellnum == 0 or sellnum == None:
+            if sellnum == 0 or sellnum is None:
                 sellnum = '구매불가'
             self.MAIN_sellList.setItem(i, 3, QTableWidgetItem(str(sellnum)))
         self.frame.hide()
@@ -299,7 +300,7 @@ class MainPage(QWidget, MainUIset):
     # 프레임을 만들어서 판매자용 구매자용 버튼을 따로 지정해서 판매자로 로그인시 판매자용 버튼만 보이게,
     # 구매자로 로그인시 구매자용 버튼만 보이게 하는 기능.
     def BT_setting(self):
-        if self.LOGIN_signal == False:
+        if not self.LOGIN_signal:
             self.frame_buyer.hide()
             self.frame_seller.hide()
             self.alert_frame.hide()
@@ -355,7 +356,6 @@ class MainPage(QWidget, MainUIset):
     # 테이블위젯의 행을 1개씩 추가하거나 제거하는 기능.
     def rowplus(self, signal):
         if signal == 1:
-            self.combobox = QComboBox()
             self.combobox.addItem('g')
             self.combobox.addItem('mg')
             self.combobox.addItem('ml')
@@ -377,15 +377,15 @@ class MainPage(QWidget, MainUIset):
                     if self.MAIN_strorelist.item(i, j).text() == None or \
                             self.MAIN_strorelist.item(i, j).text() == "" or \
                             self.MAIN_strorelist.item(i, j).text() == " ":
-                        msg = QMessageBox.information(self, "알림", "정보를 입력해주세요")
+                        QMessageBox.information(self, "알림", "정보를 입력해주세요")
                         return
                 except AttributeError:
-                    msg = QMessageBox.information(self, "알림", "정보를 입력해주세요")
+                    QMessageBox.information(self, "알림", "정보를 입력해주세요")
                     return
 
         try:
-            if self.MAIN_LE_productName.text() == None or self.MAIN_LE_productName.text().strip() == "":
-                msg = QMessageBox.information(self, "알림", "정보를 입력해주세요")
+            if self.MAIN_LE_productName.text() is None or self.MAIN_LE_productName.text().strip() == "":
+                QMessageBox.information(self, "알림", "정보를 입력해주세요")
                 return
             db = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r', charset='utf8')
             cursor = db.cursor()
@@ -394,11 +394,12 @@ class MainPage(QWidget, MainUIset):
                                   f"WHERE product_name='{self.MAIN_LE_productName.text()}'")
             print(test, "test")
             if test != 0:
-                msg = QMessageBox.information(self, "알림", "이미 존재합니다.")
+                QMessageBox.information(self, "알림", "이미 존재합니다.")
                 return
             cursor.execute("INSERT INTO project7smartstore.product_info "
                            f"(product_name,store_name,product_price) "
-                           f"VALUES('{self.MAIN_LE_productName.text()}','{self.UserInfo[5]}','{self.MAIN_LE_productPrice.text()}')")
+                           f"VALUES('{self.MAIN_LE_productName.text()}','{self.UserInfo[5]}',"
+                           f"'{self.MAIN_LE_productPrice.text()}')")
             # db.commit()
 
             for i in range(self.MAIN_strorelist.rowCount()):
@@ -415,7 +416,8 @@ class MainPage(QWidget, MainUIset):
                 info = cursor.fetchall()
 
                 cursor.execute("SELECT * FROM project7smartstore.product_info "
-                               f"WHERE product_name='{self.MAIN_LE_productName.text()}' and store_name='{self.UserInfo[5]}'")
+                               f"WHERE product_name='{self.MAIN_LE_productName.text()}' "
+                               f"and store_name='{self.UserInfo[5]}'")
                 temp2 = cursor.fetchall()
                 if check == 0:  # BoM_insert 프리시저 사용
                     cursor.execute(f"call project7smartstore.BoM_insert('PJ{str(temp).zfill(4)}',"
@@ -431,16 +433,18 @@ class MainPage(QWidget, MainUIset):
                                    f"'{temp2[0][0]}','{temp2[0][1]}')")
 
         except AttributeError:
-            msg = QMessageBox.information(self, "알림", "정보를 입력해주세요")
+            QMessageBox.information(self, "알림", "정보를 입력해주세요")
             return
         except pymysql.err.DataError:
-            msg = QMessageBox.information(self, "알림", "잘못된 정보입니다.")
+            QMessageBox.information(self, "알림", "잘못된 정보입니다.")
             return
         except pymysql.err.OperationalError:
-            msg = QMessageBox.information(self, "알림", " operational Error")
+            QMessageBox.information(self, "알림", " operational Error")
             return
         db.commit()
         db.close()
+
+# ===================================================== 재료 관리 =====================================================
 
     def set_material_db(self):
         conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
@@ -449,12 +453,9 @@ class MainPage(QWidget, MainUIset):
 
         c.execute('SELECT * FROM `project7smartstore`.`bill_of_material`')
         # 0 = BoM idx, 1 = 재료 idx, 2 = 재료명, 3 = 재료 소모량, 4 = 계량 단위, 5 = 상품(사용처) idx, 6 = 상품명
-        self.material_db = c.fetchall()
+        self.material_db = self.exe_db_smartstore(sql)
 
-        c.close()
-        conn.close()
-
-    def move_to_bill_of_material(self):
+    def set_bill_of_material_ui(self):
         self.set_material_db()
         # User_Info 0 = 유저 idx, 1 = 유저 id, 2 = 유저 pw, 3 = 유저명, 4 = 전화번호, 5 = 상호명, 6 = 유저 분류
         self.bom_store_name.setText(self.UserInfo[5])
@@ -465,12 +466,17 @@ class MainPage(QWidget, MainUIset):
         self.define_bom_combo_item()
         self.set_bom_table()
 
+    def move_to_bill_of_material(self):
+        self.set_bill_of_material_ui()
         self.MAIN_STACK.setCurrentIndex(1)
 
     def define_bom_combo_item(self):
         self.bom_select_menu.clear()
-        # 기본값 전체 설정
+        # 기본 값으로 '전체' 설정
         self.bom_select_menu.addItem('전체')
+        self.fill_menu_list()
+
+    def fill_menu_list(self):
         menu = []
         # DB상 상품명을 중복되지 않게 메뉴 리스트에 삽입
         for item in self.material_db:
@@ -482,94 +488,87 @@ class MainPage(QWidget, MainUIset):
                 self.bom_select_menu.addItem(item)
 
     def set_bom_table(self):
+        # 버티컬 헤더 가림
         self.bom_ingredient_table.verticalHeader().setVisible(False)
         self.bom_ingredient_table.setColumnWidth(0, 72)
         self.bom_ingredient_table.setColumnWidth(1, 60)
         self.bom_ingredient_table.setColumnWidth(2, 240)
 
         self.get_bom_table_db()
+        # 현재 메뉴 콤보박스에 선택된 메뉴가 있을 시 menu_changed 함수 연결
         if len(self.bom_select_menu.currentText()) > 0:
             self.bom_select_menu.currentTextChanged.connect(self.menu_changed)
 
+    def menu_changed(self):
+        self.default_bom_table_and_label()
+        self.set_bom_table_logic()
+        self.set_bom_available()
+
     def get_bom_table_db(self):
+        sql = 'CALL group_product_by_material();'
+        # 0 = 재료명(명칭과 계량 단위가 겹치지 않음), 1 = 보유 수량, 2 = 사용처 그룹
+        self.table_data = self.exe_db_smartstore(sql)
+        self.loop_put_all_data_in()
 
-        conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
-                               db='project7smartstore')
-        c = conn.cursor()
-
-        c.execute('call project7smartstore.group_product_by_material();')
-
-        # 프로시저 호출을 통해 받아온 DB값, 0 = 재료명(명칭과 계량 단위가 겹치지 않음), 1 = 보유 수량, 2 = 사용처 그룹
-        self.table_data = c.fetchall()
-        self.bom_table_default_data()
-
-        c.close()
-        conn.close()
-
-    def bom_table_default_data(self):
-        # 프로시저를 통해 받아온 DB의 요소 수만큼 반복함
+    def loop_put_all_data_in(self):
+        # 툴팁과 데이터를 테이블에 삽입하기 위해 행 설정 및 반복문 실행
         self.bom_ingredient_table.setRowCount(len(self.table_data))
 
         for i in range(len(self.table_data)):
             for j in range(len(self.table_data[i])):
                 self.set_bom_table_data_tooltip(i, j, i, j)
 
+    # 툴팁과 데이터를 주어진 인수에 따라 채움
     def set_bom_table_data_tooltip(self, row, column, i, j):
         self.bom_ingredient_table.setItem(row, column, QTableWidgetItem(self.table_data[i][j]))
         self.bom_ingredient_table.item(row, column).setToolTip(self.table_data[i][j])
 
-    def menu_changed(self):
-        self.set_bom_table_logic()
-        self.set_bom_available()
-
-    def set_bom_table_logic(self):
+    # 테이블 기본 설정
+    def default_bom_table_and_label(self):
         if self.bom_select_menu.currentText() == '전체':
-            self.bom_table_default_data()
-
-        else:
-            if len(self.bom_select_menu.currentText()) > 0:
-                # bom_table_row, bom_table_column은 set_bom_table_data_tooltip 함수에서 각각 row, column으로 사용함
-                # 반복문에서의 i, j값과 별개로 데이터 축적시마다 1개씩 증가해 올바른 표의 행과 열에 들어감
-                bom_table_row = 0
-                self.bom_ingredient_table.setRowCount(bom_table_row)
-
-                for i in range(len(self.table_data)):
-                    # self.table_data =
-                    # [material_name, material_quantity+measure_unit, product_name GROUP BY material_name]
-                    if self.bom_select_menu.currentText() in self.table_data[i][2]:
-                        bom_table_row += 1
-                        bom_table_column = 0
-                        self.bom_ingredient_table.setRowCount(bom_table_row)
-
-                        for j in range(len(self.table_data[i])):
-                            self.set_bom_table_data_tooltip(bom_table_row - 1, bom_table_column, i, j)
-                            bom_table_column += 1
-
-    def set_bom_available(self):
-        if self.bom_select_menu.currentText() == '전체':
+            self.loop_put_all_data_in()
             self.bom_available.setText('')
 
-        else:
+    def set_bom_table_logic(self):
+        # bom_table_row, bom_table_column은 set_bom_table_data_tooltip 함수에서 각각 row, column으로 사용함
+        # 반복문에서의 i, j값과 별개로 데이터 축적시마다 1개씩 증가해 올바른 표의 행과 열에 삽입
+        if self.bom_select_menu.currentText() != '전체' and len(self.bom_select_menu.currentText()) > 0:
+
+            bom_table_row = 0
+            self.bom_ingredient_table.setRowCount(bom_table_row)
+
+            for i in range(len(self.table_data)):
+                if self.bom_select_menu.currentText() in self.table_data[i][2]:
+                    bom_table_row += 1
+                    bom_table_column = 0
+
+                    self.bom_ingredient_table.setRowCount(bom_table_row)
+
+                    for j in range(len(self.table_data[i])):
+                        self.set_bom_table_data_tooltip(bom_table_row - 1, bom_table_column, i, j)
+                        bom_table_column += 1
+
+    def set_bom_available(self):
+        if self.bom_select_menu.currentText() != '전체':
             if len(self.bom_select_menu.currentText()) > 0:
-                conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
-                                       db='project7smartstore')
-                c = conn.cursor()
 
                 # 콤보박스에서 선택된 메뉴의 재료들 중 가장 작은 재료재고/재료소모량 값을 가져옴
-                c.execute(f'''SELECT min(b.inventory_quantity DIV a.material_quantity) AS produce_available 
-                FROM bill_of_material AS a 
-                INNER JOIN material_management AS b 
-                ON a.material_name=b.material_name 
-                WHERE a.product_name="{self.bom_select_menu.currentText()}"''')
+                sql = f'CALL get_minimun_ingredient_left("{self.bom_select_menu.currentText()}");'
+                producible = self.exe_db_smartstore(sql)[0][0]
 
-                producible = c.fetchall()[0][0]
+                self.set_bom_available_text(producible)
 
-                if producible < 10:
-                    self.bom_available.setStyleSheet("Color: red")
-                else:
-                    self.bom_available.setStyleSheet("Color: black")
+    def change_bom_available_text_color(self, producible):
+        # 10개 미만 제작 가능한 경우 제작 가능 표시 라벨 색을 붉게
+        if producible < 10:
+            self.bom_available.setStyleSheet("Color: red")
+        else:
+            self.bom_available.setStyleSheet("Color: black")
 
-                self.bom_available.setText(f'{str(producible)}개 제작 가능')
+    def set_bom_available_text(self, producible):
+        # 색칠 및 출력
+        self.change_bom_available_text_color(producible)
+        self.bom_available.setText(f'{str(producible)}개 제작 가능')
 
     def buy_ingredient_window(self):
         self.ingredient_window.reset_items()
@@ -577,6 +576,8 @@ class MainPage(QWidget, MainUIset):
 
     def bom_to_main(self):
         self.MAIN_STACK.setCurrentIndex(0)
+
+# ===================================================== 문의 관리 =====================================================
 
     def move_to_faq(self):
         self.set_faq_page()
@@ -616,6 +617,7 @@ class MainPage(QWidget, MainUIset):
 
     def check_store_match_faq(self, faq_data):
         store_faq = []
+        # 유저 정보와 일치하는 문의사항 선별
         for i in range(len(faq_data)):
             if self.UserInfo[0] == faq_data[i][1]:
                 store_faq.append(faq_data[i])
@@ -645,68 +647,52 @@ class MainPage(QWidget, MainUIset):
 
         return faq_process_text
 
+    def comment(self):
+        odered_comment = ['맛있어요.', '맛없어요.', '너무 매워요.', '너무 달아요.', '너무 써요', '너무 많아요.',
+                          '너무 적어요.', '왜 팔아요?', '배달이 늦었어요.']
+        not_odered_comment = ['맛있나요?', '맵나요?', '양 많은가요?', '왜 팔아요?']
+        return odered_comment, not_odered_comment
+
+    def get_faq_db(self):
+        sql = 'SELECT product_name FROM product_info;'
+        menu_db = self.exe_db_smartstore(sql)
+
+        sql = 'CALL get_ordered_customer_db;'
+        ordered_customer = self.exe_db_smartstore(sql)
+
+        sql = 'CALL get_non_ordered_customer_db;'
+        not_ordered_customer = self.exe_db_smartstore(sql)
+
+        return menu_db, ordered_customer, not_ordered_customer
+
     def make_auto_faq(self):
         while True:
-            if self.LOGIN_signal == True:
-                time.sleep(15)
+            # 로그인 시그널 참일 시 댓글 생성됨
+            if self.LOGIN_signal:
+                time.sleep(150)
                 menu = []
-                conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
-                                       db='project7smartstore')
-                c = conn.cursor()
+                # 쿼리문을 돌리기 위한 데이터 세팅
+                faq_db = self.get_faq_db()
+                comment = self.comment()
 
-                c.execute('SELECT product_name FROM product_info')
-                menu_db = c.fetchall()
-
-                c.execute('''SELECT DISTINCT c.user_idx, c.user_name, a.product_idx, a.product_name, a.order_idx
-                FROM order_management AS a
-                INNER JOIN faq_management AS b
-                INNER JOIN user_info AS c
-                ON a.customer_idx = c.user_idx
-                WHERE a.order_idx NOT IN (
-                SELECT order_idx
-                FROM faq_management
-                );''')
-                ordered_customer = c.fetchall()
-
-                c.execute('''SELECT * FROM user_info AS a 
-                JOIN product_info AS b 
-                WHERE a.user_type NOT IN(
-                SELECT user_type FROM user_info 
-                WHERE store_name=FALSE
-                )''')
-                not_ordered_customer = c.fetchall()
-                for menu_name in menu_db:
+                for menu_name in faq_db[0]:
                     menu.append(menu_name[0])
 
-                odered_comment = ['맛있어요.', '맛없어요.', '너무 매워요.', '너무 달아요.', '너무 써요', '너무 많아요.', '너무 적어요.', '왜 팔아요?',
-                                  '배달이 늦었어요.']
-                not_odered_comment = ['맛있나요?', '맵나요?', '양 많은가요?', '왜 팔아요?']
-                if random.randint(0, 1) == 1:
-                    if len(ordered_customer) > 5:
-                        if random.randint(0, 1) == 1:
+                if random.randint(0, 1) == 1 and len(faq_db[1]) > 5:
+                    # 메뉴명+코멘트로 랜덤 코멘트 작성
                             faq_content = f'{menu[random.randint(0, len(menu) - 1)]} ' \
-                                          f'{odered_comment[random.randint(0, len(odered_comment) - 1)]}'
-                            c.execute(f'''INSERT INTO faq_management
-                            (seller_idx, seller_name, buyer_idx, buyer_name, product_idx, product_name, order_idx, 
-                            faq_content) VALUES({self.UserInfo[0]}, '{self.UserInfo[3]}', {ordered_customer[0][0]}, 
-                            '{ordered_customer[0][1]}', {ordered_customer[0][2]}, '{ordered_customer[0][3]}', 
-                            {ordered_customer[0][4]}, '{faq_content}')''')
-                            conn.commit()
+                                          f'{comment[0][random.randint(0, len(comment[0]) - 1)]}'
 
-                    else:
-                        faq_content = f'{menu[random.randint(0, len(menu) - 1)]} ' \
-                                      f'{not_odered_comment[random.randint(0, len(not_odered_comment) - 1)]}'
-                        c.execute(f'''INSERT INTO faq_management
-                        (seller_idx, seller_name, buyer_idx, buyer_name, product_idx, product_name, faq_content) 
-                        VALUES({self.UserInfo[0]}, '{self.UserInfo[3]}', {not_ordered_customer[0][0]}, 
-                        '{not_ordered_customer[0][1]}', {not_ordered_customer[0][2]}, '{not_ordered_customer[0][3]}', 
-                        '{faq_content}')''')
-                        conn.commit()
+                    # 각각의 칼럼에 맞는 매개변수를 가지고 코멘트 DB를 업데이트 하는 쿼리문 실행
+                    sql = f'''CALL comment_of_ordered_customer({self.UserInfo[0]}, "{self.UserInfo[3]}", 
+                    {faq_db[1][random.randrange(len(faq_db[1]))][0]}, 
+                    "{faq_db[1][random.randrange(len(faq_db[1]))][1]}", 
+                    {faq_db[1][random.randrange(len(faq_db[1]))][2]}, 
+                    "{faq_db[1][random.randrange(len(faq_db[1]))][3]}", 
+                    {faq_db[1][random.randrange(len(faq_db[1]))][4]}, "{faq_content}")'''
+                    self.exe_db_smartstore(sql)
 
-                c.close()
-                conn.close()
-
-                time.sleep(285)
+                time.sleep(150)
 
     def faq_detail(self, store_faq_data):
         self.customer_service = CustomerService(store_faq_data[self.faq_table.currentRow()])
@@ -714,6 +700,21 @@ class MainPage(QWidget, MainUIset):
 
     def faq_to_bom(self):
         self.MAIN_STACK.setCurrentIndex(1)
+
+    @staticmethod
+    def exe_db_smartstore(sql):
+        conn = pymysql.connect(host='10.10.21.106', port=3306, user='root', password='1q2w3e4r',
+                               db='project7smartstore')
+        c = conn.cursor()
+
+        c.execute(sql)
+        conn.commit()
+        loaded = c.fetchall()
+
+        c.close()
+        conn.close()
+
+        return loaded
 
 
 if __name__ == '__main__':
